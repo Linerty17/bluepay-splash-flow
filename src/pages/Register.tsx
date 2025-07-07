@@ -17,6 +17,7 @@ const Register = () => {
     fullName: "",
     email: "",
     password: "",
+    phoneNumber: "",
   });
 
   useEffect(() => {
@@ -112,6 +113,18 @@ const Register = () => {
               className="rounded-md bg-white/10 border-white/20 px-3 py-2 text-white placeholder:text-gray-300"
               required
             />
+            <div className="relative">
+              <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-300 text-sm">+234</span>
+              <Input
+                name="phoneNumber"
+                type="tel"
+                placeholder="Phone Number"
+                value={formData.phoneNumber}
+                onChange={handleChange}
+                className="rounded-md bg-white/10 border-white/20 pl-12 py-2 text-white placeholder:text-gray-300"
+                required
+              />
+            </div>
 
             <p className="text-xs text-gray-200">
               Any further actions indicates that you agree with our terms & conditions!
