@@ -46,7 +46,7 @@ const Withdraw = () => {
       return;
     }
 
-    if (bpcCode !== "BPC5151551") {
+    if (bpcCode !== "BPC50098") {
       toast({
         variant: "destructive",
         description: "Invalid BPC code. Please enter a valid code.",
