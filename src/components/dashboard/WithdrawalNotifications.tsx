@@ -103,17 +103,31 @@ const WithdrawalNotifications = () => {
         {visibleNotifications.map((notification, index) => (
           <div
             key={notification.id}
-            className="bg-green-500 text-white px-4 py-3 rounded-lg shadow-lg flex items-center space-x-3 animate-slide-down pointer-events-auto"
+            className="bg-primary text-primary-foreground px-6 py-4 rounded-xl shadow-xl border border-primary/20 flex items-center space-x-4 animate-slide-down pointer-events-auto backdrop-blur-sm"
             style={{
               animation: `slideDown 0.5s ease-out, fadeOut 0.5s ease-out 3.5s forwards`,
-              marginTop: index * 10
+              marginTop: index * 10,
+              background: 'linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--primary)/0.8) 100%)',
+              boxShadow: '0 8px 32px rgba(0, 0, 0, 0.12), 0 2px 8px rgba(59, 130, 246, 0.3)'
             }}
           >
-            <CheckCircle className="h-5 w-5 text-white" />
+            <div className="flex-shrink-0 w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
+              <CheckCircle className="h-5 w-5 text-white" />
+            </div>
             <div className="flex-1">
-              <p className="text-sm font-medium">
-                {notification.name} just withdrew ₦{notification.amount}
+              <p className="text-sm font-semibold text-white mb-1">
+                Withdrawal Successful
               </p>
+              <p className="text-xs text-white/90">
+                {notification.name} withdrew ₦{notification.amount}
+              </p>
+            </div>
+            <div className="text-xs text-white/70 font-mono">
+              {new Date().toLocaleTimeString('en-US', { 
+                hour12: false, 
+                hour: '2-digit', 
+                minute: '2-digit' 
+              })}
             </div>
           </div>
         ))}
