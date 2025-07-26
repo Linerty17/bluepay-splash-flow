@@ -31,7 +31,7 @@ const ResetBalance = ({ isOpen, onClose }: ResetBalanceProps) => {
       return;
     }
 
-    if (bpcCode !== "BPC50098") {
+    if (bpcCode !== "BPC5226322") {
       toast({
         variant: "destructive",
         description: "Invalid BPC code. Please enter a valid code.",
