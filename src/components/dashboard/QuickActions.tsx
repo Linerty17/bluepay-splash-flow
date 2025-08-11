@@ -7,6 +7,13 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../ui/dialog";
 const QuickActions = () => {
   const navigate = useNavigate();
   const [isVideoOpen, setIsVideoOpen] = useState(false);
+  const [isVideoLoaded, setIsVideoLoaded] = useState(false);
+  
+  // Preload video after component mounts
+  React.useEffect(() => {
+    const timer = setTimeout(() => setIsVideoLoaded(true), 100);
+    return () => clearTimeout(timer);
+  }, []);
   
   const handleWatch = () => {
     setIsVideoOpen(true);
@@ -69,6 +76,21 @@ const QuickActions = () => {
         </div>
       </div>
 
+      {/* Preload iframe hidden for instant loading */}
+      {isVideoLoaded && (
+        <div className="hidden">
+          <iframe
+            width="100%"
+            height="100%"
+            src="https://www.youtube.com/embed/TYNv2EunJhE?si=lJQs_9ZKdddKov6j&enablejsapi=1&rel=0"
+            title="BluPay Tutorial Preload"
+            frameBorder="0"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+            allowFullScreen
+          />
+        </div>
+      )}
+
       <Dialog open={isVideoOpen} onOpenChange={setIsVideoOpen}>
         <DialogContent className="max-w-4xl w-full p-0 bg-black">
           <DialogHeader className="p-4 pb-0">
@@ -86,7 +108,7 @@ const QuickActions = () => {
             <iframe
               width="100%"
               height="100%"
-              src="https://www.youtube.com/embed/TYNv2EunJhE?si=lJQs_9ZKdddKov6j&autoplay=1"
+              src="https://www.youtube.com/embed/TYNv2EunJhE?si=lJQs_9ZKdddKov6j&autoplay=1&rel=0"
               title="BluPay Tutorial"
               frameBorder="0"
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
