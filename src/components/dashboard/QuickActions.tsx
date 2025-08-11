@@ -1,13 +1,15 @@
 
-import React from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Wallet, Monitor, Signal, Database } from "lucide-react";
+import { Wallet, Monitor, Signal, Database, X } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../ui/dialog";
 
 const QuickActions = () => {
   const navigate = useNavigate();
+  const [isVideoOpen, setIsVideoOpen] = useState(false);
   
   const handleWatch = () => {
-    window.open("https://t.me/officialbluepay2025", "_blank");
+    setIsVideoOpen(true);
   };
 
   const quickActions = [
@@ -46,25 +48,55 @@ const QuickActions = () => {
   ];
 
   return (
-    <div className="bg-white rounded-xl p-3 mb-2 shadow-sm">
-      <div className="grid grid-cols-4 gap-2">
-        {quickActions.map((action) => {
-          const IconComponent = action.icon;
-          return (
-            <div 
-              key={action.id}
-              className="flex flex-col items-center cursor-pointer"
-              onClick={action.onClick}
-            >
-              <div className={`h-10 w-10 ${action.bgColor} rounded-lg mb-1 flex items-center justify-center`}>
-                <IconComponent className={`h-5 w-5 ${action.iconColor}`} />
+    <>
+      <div className="bg-white rounded-xl p-3 mb-2 shadow-sm">
+        <div className="grid grid-cols-4 gap-2">
+          {quickActions.map((action) => {
+            const IconComponent = action.icon;
+            return (
+              <div 
+                key={action.id}
+                className="flex flex-col items-center cursor-pointer"
+                onClick={action.onClick}
+              >
+                <div className={`h-10 w-10 ${action.bgColor} rounded-lg mb-1 flex items-center justify-center`}>
+                  <IconComponent className={`h-5 w-5 ${action.iconColor}`} />
+                </div>
+                <p className="text-xs font-medium text-center text-gray-800">{action.title}</p>
               </div>
-              <p className="text-xs font-medium text-center text-gray-800">{action.title}</p>
-            </div>
-          );
-        })}
+            );
+          })}
+        </div>
       </div>
-    </div>
+
+      <Dialog open={isVideoOpen} onOpenChange={setIsVideoOpen}>
+        <DialogContent className="max-w-4xl w-full p-0 bg-black">
+          <DialogHeader className="p-4 pb-0">
+            <div className="flex justify-between items-center">
+              <DialogTitle className="text-white">BluPay Tutorial</DialogTitle>
+              <button 
+                onClick={() => setIsVideoOpen(false)}
+                className="text-white hover:text-gray-300 transition-colors"
+              >
+                <X className="h-6 w-6" />
+              </button>
+            </div>
+          </DialogHeader>
+          <div className="aspect-video w-full">
+            <iframe
+              width="100%"
+              height="100%"
+              src="https://www.youtube.com/embed/TYNv2EunJhE?si=lJQs_9ZKdddKov6j&autoplay=1"
+              title="BluPay Tutorial"
+              frameBorder="0"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+              allowFullScreen
+              className="rounded-b-lg"
+            />
+          </div>
+        </DialogContent>
+      </Dialog>
+    </>
   );
 };
 
