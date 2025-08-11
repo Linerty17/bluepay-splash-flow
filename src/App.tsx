@@ -7,6 +7,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { useEffect } from "react";
 import { useUserStore } from "./stores/userStore";
 import ChatBot from "./components/ChatBot";
+import CBNWatermark from "./components/CBNWatermark";
 import Index from "./pages/Index";
 import Register from "./pages/Register";
 import SetupPin from "./pages/SetupPin";
@@ -87,7 +88,8 @@ const App = () => (
       <ThemeManager />
       <Toaster />
       <Sonner />
-      <BrowserRouter>
+       <BrowserRouter>
+        <CBNWatermark />
         <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/register" element={<Register />} />
