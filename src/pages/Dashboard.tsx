@@ -12,8 +12,6 @@ import OpayNotificationBanner from "../components/dashboard/OpayNotificationBann
 import ImportantInformation from "../components/dashboard/ImportantInformation";
 import WithdrawalNotifications from "../components/dashboard/WithdrawalNotifications";
 import JoinGroupsAd from "../components/dashboard/JoinGroupsAd";
-import DraggableBadge from "../components/dashboard/DraggableBadge";
-
 const Dashboard = () => {
   const { userData, balance, transactions } = useUserStore();
 
@@ -34,7 +32,6 @@ const Dashboard = () => {
       </div>
       
       <BottomNavigation />
-      <DraggableBadge />
     </div>
   );
 };
