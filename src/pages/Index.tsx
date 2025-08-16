@@ -7,7 +7,7 @@ const Index = () => {
   const navigate = useNavigate();
 
   return (
-    <div className="flex flex-col min-h-screen bg-[hsl(240_100%_50%)] text-white">
+    <div className="flex flex-col min-h-screen bg-bluepay-blue text-white">
       <div className="flex-1 flex flex-col">
         <header className="p-4">
           <div className="flex items-center">
@@ -39,7 +39,7 @@ const Index = () => {
               online and start paying all your bills in cheaper price.
             </p>
             <Button 
-              className="bg-white hover:bg-gray-100 text-[hsl(240_100%_50%)] font-bold py-3 px-8 rounded-full text-lg"
+              className="bg-white hover:bg-gray-100 text-bluepay-blue font-bold py-3 px-8 rounded-full text-lg"
               onClick={() => navigate("/register")}
             >
               Get Started
