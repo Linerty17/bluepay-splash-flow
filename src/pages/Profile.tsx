@@ -97,7 +97,7 @@ const Profile = () => {
   };
 
   const handleDownloadApp = () => {
-    window.open("https://www.upload-apk.com/lW4B836tNBcyJvU", "_blank");
+    window.open("https://www.upload-apk.com/DGGv0TvbouKJJHW", "_blank");
     toast({
       title: "Opening download page",
       description: "Redirecting to app download...",
