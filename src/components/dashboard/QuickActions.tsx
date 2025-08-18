@@ -82,10 +82,10 @@ const QuickActions = () => {
           <iframe
             width="100%"
             height="100%"
-            src="https://www.youtube.com/embed/TYNv2EunJhE?si=lJQs_9ZKdddKov6j&enablejsapi=1&rel=0"
+            src="https://player.vimeo.com/video/1111008322"
             title="BluPay Tutorial Preload"
             frameBorder="0"
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+            allow="autoplay; fullscreen; picture-in-picture"
             allowFullScreen
           />
         </div>
@@ -108,10 +108,10 @@ const QuickActions = () => {
             <iframe
               width="100%"
               height="100%"
-              src="https://www.youtube.com/embed/TYNv2EunJhE?si=lJQs_9ZKdddKov6j&autoplay=1&rel=0"
+              src="https://player.vimeo.com/video/1111008322?autoplay=1"
               title="BluPay Tutorial"
               frameBorder="0"
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+              allow="autoplay; fullscreen; picture-in-picture"
               allowFullScreen
               className="rounded-b-lg"
             />
