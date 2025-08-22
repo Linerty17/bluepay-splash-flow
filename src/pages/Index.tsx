@@ -2,9 +2,18 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
+import { useAuth } from "@/contexts/AuthContext";
 
 const Index = () => {
   const navigate = useNavigate();
+  const { user } = useAuth();
+
+  // Redirect authenticated users to dashboard
+  React.useEffect(() => {
+    if (user && user.email_confirmed_at) {
+      navigate("/dashboard");
+    }
+  }, [user, navigate]);
 
   return (
     <div className="flex flex-col min-h-screen bg-bluepay-blue text-white">
@@ -38,12 +47,21 @@ const Index = () => {
               Get your account ready and instantly start buying, selling airtime and data
               online and start paying all your bills in cheaper price.
             </p>
-            <Button 
-              className="bg-white hover:bg-gray-100 text-bluepay-blue font-bold py-3 px-8 rounded-full text-lg"
-              onClick={() => navigate("/register")}
-            >
-              Get Started
-            </Button>
+            <div className="space-y-3">
+              <Button 
+                className="w-full bg-white hover:bg-gray-100 text-bluepay-blue font-bold py-3 px-8 rounded-full text-lg"
+                onClick={() => navigate("/register")}
+              >
+                Get Started
+              </Button>
+              <Button 
+                variant="outline"
+                className="w-full bg-transparent hover:bg-white/10 text-white border-white/30 font-medium py-3 px-8 rounded-full text-lg"
+                onClick={() => navigate("/login")}
+              >
+                Sign In
+              </Button>
+            </div>
           </div>
         </main>
       </div>
