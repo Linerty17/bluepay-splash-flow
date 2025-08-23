@@ -30,15 +30,31 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setLoading(false);
 
         if (event === 'SIGNED_IN') {
-          toast({
-            title: "Welcome back!",
-            description: "You have successfully signed in.",
-          });
+          // Check if this is an email confirmation
+          if (session?.user?.email_confirmed_at && !session.user.user_metadata?.confirmed_redirect) {
+            // Mark that we've handled this confirmation
+            setTimeout(() => {
+              window.location.href = '/dashboard';
+            }, 100);
+            
+            toast({
+              title: "Email Confirmed!",
+              description: "Welcome to BLUEPAY! Redirecting to dashboard...",
+            });
+          } else {
+            toast({
+              title: "Welcome back!",
+              description: "You have successfully signed in.",
+            });
+          }
         } else if (event === 'SIGNED_OUT') {
           toast({
             title: "Signed out",
             description: "You have been signed out successfully.",
           });
+        } else if (event === 'TOKEN_REFRESHED') {
+          // Handle token refresh silently
+          console.log('Session token refreshed');
         }
       }
     );
