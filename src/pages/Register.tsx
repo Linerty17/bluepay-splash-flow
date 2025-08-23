@@ -4,16 +4,15 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
-import { useAuth } from "@/contexts/AuthContext";
+import { useUserStore } from "../stores/userStore";
 import { useToast } from "@/hooks/use-toast";
 
 const Register = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
-  const { signUp } = useAuth();
+  const { setUserData } = useUserStore();
   const [searchParams] = useSearchParams();
   const [referralCode, setReferralCode] = useState("");
-  const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     fullName: "",
     email: "",
@@ -37,55 +36,21 @@ const Register = () => {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
-
-    try {
-      const { error } = await signUp(
-        formData.email,
-        formData.password,
-        formData.fullName,
-        formData.phoneNumber,
-        referralCode
-      );
-
-      if (error) {
-        if (error.message.includes('User already registered')) {
-          toast({
-            title: "Account Already Exists",
-            description: "An account with this email already exists. Please sign in instead.",
-            variant: "destructive",
-          });
-        } else if (error.message.includes('Password should be at least 6 characters')) {
-          toast({
-            title: "Password Too Short",
-            description: "Password must be at least 6 characters long.",
-            variant: "destructive",
-          });
-        } else {
-          toast({
-            title: "Registration Failed",
-            description: error.message,
-            variant: "destructive",
-          });
-        }
-      } else {
-        toast({
-          title: "Registration Successful!",
-          description: "Please check your email and click the verification link to activate your account.",
-        });
-        navigate("/verify-email");
-      }
-    } catch (error) {
+    setUserData({
+      fullName: formData.fullName,
+      email: formData.email
+    });
+    
+    if (referralCode) {
       toast({
-        title: "Registration Failed",
-        description: "An unexpected error occurred. Please try again.",
-        variant: "destructive",
+        title: "Registration Successful!",
+        description: `Welcome! Your ₦20,000 referral bonus will be credited after PIN setup.`,
       });
-    } finally {
-      setLoading(false);
     }
+    
+    navigate("/setup-pin");
   };
 
   const handleHelpClick = () => {
@@ -167,17 +132,16 @@ const Register = () => {
 
             <Button
               type="submit"
-              disabled={loading}
               className="w-full bg-white hover:bg-gray-100 text-bluepay-blue py-2 font-bold rounded-full"
             >
-              {loading ? "Creating account..." : "Create account"}
+              Create account
             </Button>
           </form>
 
           <div className="mt-6 text-center">
             <span className="text-gray-200 text-sm">Already have an account? </span>
             <button 
-              onClick={() => navigate("/login")} 
+              onClick={() => navigate("/pin")} 
               className="text-white font-medium underline text-sm"
             >
               Sign in
