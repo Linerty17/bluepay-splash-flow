@@ -6,9 +6,13 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { useEffect } from "react";
 import { useUserStore } from "./stores/userStore";
+import { AuthProvider } from "./contexts/AuthContext";
+import { ProtectedRoute } from "./components/ProtectedRoute";
 import ChatBot from "./components/ChatBot";
 import Index from "./pages/Index";
 import Register from "./pages/Register";
+import Login from "./pages/Login";
+import VerifyEmail from "./pages/VerifyEmail";
 import SetupPin from "./pages/SetupPin";
 import Dashboard from "./pages/Dashboard";
 import Profile from "./pages/Profile";
@@ -84,36 +88,112 @@ const ThemeManager = () => {
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
-      <ThemeManager />
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Index />} />
-          <Route path="/register" element={<Register />} />
-          <Route path="/setup-pin" element={<SetupPin />} />
-          <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/pin" element={<SetupPin />} />
-          <Route path="/profile" element={<Profile />} />
-          <Route path="/withdraw" element={<Withdraw />} />
-          <Route path="/withdraw/processing" element={<WithdrawProcessing />} />
-          <Route path="/buy-bpc" element={<BuyBPC />} />
-          <Route path="/buy-bpc/processing" element={<BuyBPCProcessing />} />
-          <Route path="/buy-bpc/payment" element={<BuyBPCPayment />} />
-          <Route path="/buy-bpc/verifying" element={<BuyBPCVerifying />} />
-          <Route path="/buy-bpc/confirmation" element={<BuyBPCConfirmation />} />
-          <Route path="/airtime" element={<AirtimePurchase />} />
-          <Route path="/data" element={<DataPurchase />} />
-          <Route path="/support" element={<Support />} />
-          <Route path="/admin" element={<Admin />} />
-          <Route path="/faq" element={<Faq />} />
-          <Route path="/platform" element={<Platform />} />
-          <Route path="/earn-more" element={<EarnMore />} />
-          <Route path="/transaction-history" element={<TransactionHistory />} />
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-        <ChatBot />
-      </BrowserRouter>
+      <AuthProvider>
+        <ThemeManager />
+        <Toaster />
+        <Sonner />
+        <BrowserRouter>
+          <Routes>
+            <Route path="/" element={<Index />} />
+            <Route path="/register" element={<Register />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/verify-email" element={<VerifyEmail />} />
+            <Route path="/setup-pin" element={
+              <ProtectedRoute>
+                <SetupPin />
+              </ProtectedRoute>
+            } />
+            <Route path="/dashboard" element={
+              <ProtectedRoute>
+                <Dashboard />
+              </ProtectedRoute>
+            } />
+            <Route path="/pin" element={<SetupPin />} />
+            <Route path="/profile" element={
+              <ProtectedRoute>
+                <Profile />
+              </ProtectedRoute>
+            } />
+            <Route path="/withdraw" element={
+              <ProtectedRoute>
+                <Withdraw />
+              </ProtectedRoute>
+            } />
+            <Route path="/withdraw/processing" element={
+              <ProtectedRoute>
+                <WithdrawProcessing />
+              </ProtectedRoute>
+            } />
+            <Route path="/buy-bpc" element={
+              <ProtectedRoute>
+                <BuyBPC />
+              </ProtectedRoute>
+            } />
+            <Route path="/buy-bpc/processing" element={
+              <ProtectedRoute>
+                <BuyBPCProcessing />
+              </ProtectedRoute>
+            } />
+            <Route path="/buy-bpc/payment" element={
+              <ProtectedRoute>
+                <BuyBPCPayment />
+              </ProtectedRoute>
+            } />
+            <Route path="/buy-bpc/verifying" element={
+              <ProtectedRoute>
+                <BuyBPCVerifying />
+              </ProtectedRoute>
+            } />
+            <Route path="/buy-bpc/confirmation" element={
+              <ProtectedRoute>
+                <BuyBPCConfirmation />
+              </ProtectedRoute>
+            } />
+            <Route path="/airtime" element={
+              <ProtectedRoute>
+                <AirtimePurchase />
+              </ProtectedRoute>
+            } />
+            <Route path="/data" element={
+              <ProtectedRoute>
+                <DataPurchase />
+              </ProtectedRoute>
+            } />
+            <Route path="/support" element={
+              <ProtectedRoute>
+                <Support />
+              </ProtectedRoute>
+            } />
+            <Route path="/admin" element={
+              <ProtectedRoute>
+                <Admin />
+              </ProtectedRoute>
+            } />
+            <Route path="/faq" element={
+              <ProtectedRoute>
+                <Faq />
+              </ProtectedRoute>
+            } />
+            <Route path="/platform" element={
+              <ProtectedRoute>
+                <Platform />
+              </ProtectedRoute>
+            } />
+            <Route path="/earn-more" element={
+              <ProtectedRoute>
+                <EarnMore />
+              </ProtectedRoute>
+            } />
+            <Route path="/transaction-history" element={
+              <ProtectedRoute>
+                <TransactionHistory />
+              </ProtectedRoute>
+            } />
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+          <ChatBot />
+        </BrowserRouter>
+      </AuthProvider>
     </TooltipProvider>
   </QueryClientProvider>
 );
