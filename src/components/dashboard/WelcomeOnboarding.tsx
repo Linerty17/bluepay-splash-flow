@@ -8,11 +8,21 @@ import {
 import { Button } from "@/components/ui/button";
 import { X, CreditCard, Phone, Wallet, Zap, Gift, MessageCircle, Users } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { useUserStore } from "@/stores/userStore";
 
 const WelcomeOnboarding = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [currentStep, setCurrentStep] = useState(0);
   const navigate = useNavigate();
+  const { userData } = useUserStore();
+  
+  // Extract first name from full name
+  const getFirstName = () => {
+    if (userData?.fullName) {
+      return userData.fullName.split(' ')[0];
+    }
+    return "User";
+  };
 
   const steps = [
     {
@@ -93,7 +103,7 @@ const WelcomeOnboarding = () => {
           <DialogHeader className="text-center">
             <div className="flex justify-between items-center mb-2">
               <DialogTitle className="text-lg font-bold text-white flex-1">
-                Welcome to BLUEPAY, Su!
+                Welcome to BLUEPAY, {getFirstName()}!
               </DialogTitle>
               <button
                 onClick={handleSkip}
