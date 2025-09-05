@@ -22,7 +22,7 @@ const QuickActions = () => {
   const quickActions = [
     {
       id: 'buy-bpc',
-      title: 'Buy PAY ID',
+      title: 'Buy BPC',
       icon: CreditCard,
       bgColor: 'bg-purple-100',
       iconColor: 'text-purple-600',
