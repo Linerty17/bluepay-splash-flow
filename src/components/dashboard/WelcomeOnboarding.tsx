@@ -18,13 +18,13 @@ const WelcomeOnboarding = () => {
     {
       icon: <Gift className="h-8 w-8 text-white" />,
       title: "Happy new month 🤗",
-      description: "Welcome to the ultimate bonus claim trusted platform click on \"claim bonus\" to start earning which can be withdrawn after purchasing a fair code.",
+      description: "Welcome to the ultimate bonus claim trusted platform click on \"claim bonus\" to start earning which can be withdrawn after purchasing a BPC code.",
       buttonText: "Next →"
     },
     {
       icon: <CreditCard className="h-8 w-8 text-white" />,
-      title: "Get Your Fair Code",
-      description: "To withdraw funds, you'll need to purchase a Fair Code for ₦5,500. This is a one-time purchase that unlocks all features of the app.",
+      title: "Get Your BPC Code",
+      description: "To withdraw funds, you'll need to purchase a BPC Code for ₦6,200. This is a one-time purchase that unlocks all features of the app.",
       buttonText: "Next →"
     },
     {
@@ -36,7 +36,7 @@ const WelcomeOnboarding = () => {
     {
       icon: <Wallet className="h-8 w-8 text-white" />,
       title: "Withdrawal Process",
-      description: "To withdraw your funds, tap the \"Withdraw\" button on your dashboard, enter your bank details and Fair Code, and submit your request. Withdrawals are processed within 24 hours.",
+      description: "To withdraw your funds, tap the \"Withdraw\" button on your dashboard, enter your bank details and BPC Code, and submit your request. Withdrawals are processed within 24 hours.",
       buttonText: "Next →"
     },
     {
