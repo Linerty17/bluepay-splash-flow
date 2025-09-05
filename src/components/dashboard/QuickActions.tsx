@@ -1,7 +1,7 @@
 
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Wallet, Monitor, Signal, Database, X } from "lucide-react";
+import { CreditCard, Monitor, Phone, Database, X } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../ui/dialog";
 
 const QuickActions = () => {
@@ -22,10 +22,10 @@ const QuickActions = () => {
   const quickActions = [
     {
       id: 'buy-bpc',
-      title: 'Buy BPC',
-      icon: Wallet,
-      bgColor: 'bg-yellow-100',
-      iconColor: 'text-yellow-600',
+      title: 'Buy PAY ID',
+      icon: CreditCard,
+      bgColor: 'bg-purple-100',
+      iconColor: 'text-purple-600',
       onClick: () => navigate("/buy-bpc")
     },
     {
@@ -39,9 +39,9 @@ const QuickActions = () => {
     {
       id: 'airtime',
       title: 'Airtime',
-      icon: Signal,
-      bgColor: 'bg-green-100',
-      iconColor: 'text-green-600',
+      icon: Phone,
+      bgColor: 'bg-orange-100',
+      iconColor: 'text-orange-600',
       onClick: () => navigate("/airtime")
     },
     {

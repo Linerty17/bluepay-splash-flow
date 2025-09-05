@@ -1,7 +1,7 @@
 
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import { Headphones, Users, Coins, User } from "lucide-react";
+import { Headphones, Globe, DollarSign, User } from "lucide-react";
 
 const MoreServices = () => {
   const navigate = useNavigate();
@@ -18,15 +18,15 @@ const MoreServices = () => {
     {
       id: 'group',
       title: 'Group',
-      icon: Users,
+      icon: Globe,
       bgColor: 'bg-blue-100',
       iconColor: 'text-blue-600',
       onClick: () => navigate("/platform")
     },
     {
       id: 'earn',
-      title: 'Earn',
-      icon: Coins,
+      title: 'Earn More',
+      icon: DollarSign,
       bgColor: 'bg-yellow-100',
       iconColor: 'text-yellow-600',
       onClick: () => navigate("/earn-more")

@@ -6,7 +6,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { X, CreditCard, Phone, Wallet, Zap, Gift, MessageCircle, Users } from "lucide-react";
+import { X, CreditCard, Phone, Wallet, Zap, Gift, MessageCircle, Globe, Monitor, Database, Headphones, DollarSign, User } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useUserStore } from "@/stores/userStore";
 
@@ -50,7 +50,7 @@ const WelcomeOnboarding = () => {
       buttonText: "Next →"
     },
     {
-      icon: <Zap className="h-8 w-8 text-white" />,
+      icon: <DollarSign className="h-8 w-8 text-white" />,
       title: "Earn More",
       description: "Explore our app to discover ways to earn more! Refer friends to earn ₦500 per referral, join our communities, and take advantage of special promotions.",
       buttonText: "Get Started →",
@@ -154,8 +154,8 @@ const WelcomeOnboarding = () => {
                 onClick={handleCommunities}
                 className="flex flex-col items-center gap-2 p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
               >
-                <div className="w-12 h-12 rounded-full bg-pink-100 dark:bg-pink-900 flex items-center justify-center">
-                  <Users className="h-6 w-6 text-pink-600" />
+                <div className="w-12 h-12 rounded-full bg-blue-100 dark:bg-blue-900 flex items-center justify-center">
+                  <Globe className="h-6 w-6 text-blue-600" />
                 </div>
                 <span className="text-xs font-medium text-gray-700 dark:text-gray-300">Communities</span>
               </button>
@@ -164,8 +164,8 @@ const WelcomeOnboarding = () => {
                 onClick={handleSupport}
                 className="flex flex-col items-center gap-2 p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
               >
-                <div className="w-12 h-12 rounded-full bg-blue-100 dark:bg-blue-900 flex items-center justify-center">
-                  <MessageCircle className="h-6 w-6 text-blue-600" />
+                <div className="w-12 h-12 rounded-full bg-gray-100 dark:bg-gray-900 flex items-center justify-center">
+                  <Headphones className="h-6 w-6 text-gray-600" />
                 </div>
                 <span className="text-xs font-medium text-gray-700 dark:text-gray-300">Support</span>
               </button>
