@@ -24,73 +24,55 @@ const Support = () => {
       <div className="p-4 flex-1">
         <h2 className="text-xl font-bold mb-4">How can we help you?</h2>
         
-        <div className="space-y-3">
-          <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-100">
-            <div className="flex items-center gap-3">
-              <div className="h-10 w-10 bg-blue-100 rounded-full flex items-center justify-center">
-                <Mail className="h-5 w-5 text-blue-600" />
+        <div className="space-y-4">
+          <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl p-5 shadow-lg border border-blue-100">
+            <div className="flex items-center gap-4">
+              <div className="h-12 w-12 bg-gradient-to-r from-blue-500 to-blue-600 rounded-full flex items-center justify-center shadow-md">
+                <Mail className="h-6 w-6 text-white" />
               </div>
-              <div>
-                <h3 className="text-base font-semibold">Email Support</h3>
-                <p className="text-gray-500 text-xs">Get help via email</p>
+              <div className="flex-1">
+                <h3 className="text-lg font-bold text-gray-800">Email Support</h3>
+                <p className="text-gray-600 text-sm">Get comprehensive help via email</p>
               </div>
             </div>
             <Button 
-              className="w-full mt-3 bg-blue-600 hover:bg-blue-700 py-2 text-sm"
-              onClick={() => window.open('mailto: bluepaycustomerservice25@gmail.com')}
+              className="w-full mt-4 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 py-3 text-sm font-semibold rounded-xl shadow-md transition-all duration-200"
+              onClick={() => window.open('mailto:bluepaycustomerservice25@gmail.com')}
             >
-              Contact via Email
+              Send Email
             </Button>
           </div>
           
-          <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-100">
-            <div className="flex items-center gap-3">
-              <div className="h-10 w-10 bg-blue-100 rounded-full flex items-center justify-center">
-                <MessageSquare className="h-5 w-5 text-blue-600" />
+          <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-2xl p-5 shadow-lg border border-green-100">
+            <div className="flex items-center gap-4">
+              <div className="h-12 w-12 bg-gradient-to-r from-green-500 to-green-600 rounded-full flex items-center justify-center shadow-md">
+                <Phone className="h-6 w-6 text-white" />
               </div>
-              <div>
-                <h3 className="text-base font-semibold">Telegram Support</h3>
-                <p className="text-gray-500 text-xs">Chat with us on Telegram</p>
-              </div>
-            </div>
-            <Button 
-              className="w-full mt-3 bg-blue-600 hover:bg-blue-700 py-2 text-sm"
-              onClick={() => window.open('https://t.me/Officialbluepay')}
-            >
-              Open Telegram
-            </Button>
-          </div>
-          
-          <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-100">
-            <div className="flex items-center gap-3">
-              <div className="h-10 w-10 bg-blue-100 rounded-full flex items-center justify-center">
-                <Phone className="h-5 w-5 text-blue-600" />
-              </div>
-              <div>
-                <h3 className="text-base font-semibold">WhatsApp Support</h3>
-                <p className="text-gray-500 text-xs">Message us on WhatsApp</p>
+              <div className="flex-1">
+                <h3 className="text-lg font-bold text-gray-800">WhatsApp Support</h3>
+                <p className="text-gray-600 text-sm">Quick chat on WhatsApp</p>
               </div>
             </div>
             <Button 
-              className="w-full mt-3 bg-blue-600 hover:bg-blue-700 py-2 text-sm"
+              className="w-full mt-4 bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 py-3 text-sm font-semibold rounded-xl shadow-md transition-all duration-200"
               onClick={() => window.open('https://wa.me/2349082468216')}
             >
               Chat on WhatsApp
             </Button>
           </div>
           
-          <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-100">
-            <div className="flex items-center gap-3">
-              <div className="h-10 w-10 bg-blue-100 rounded-full flex items-center justify-center">
-                <LifeBuoy className="h-5 w-5 text-blue-600" />
+          <div className="bg-gradient-to-r from-purple-50 to-violet-50 rounded-2xl p-5 shadow-lg border border-purple-100">
+            <div className="flex items-center gap-4">
+              <div className="h-12 w-12 bg-gradient-to-r from-purple-500 to-purple-600 rounded-full flex items-center justify-center shadow-md">
+                <LifeBuoy className="h-6 w-6 text-white" />
               </div>
-              <div>
-                <h3 className="text-base font-semibold">Live Chat Support</h3>
-                <p className="text-gray-500 text-xs">Chat with a support agent</p>
+              <div className="flex-1">
+                <h3 className="text-lg font-bold text-gray-800">Live Chat Support</h3>
+                <p className="text-gray-600 text-sm">Instant chat with support agents</p>
               </div>
             </div>
             <Button 
-              className="w-full mt-3 bg-blue-600 hover:bg-blue-700 py-2 text-sm"
+              className="w-full mt-4 bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 py-3 text-sm font-semibold rounded-xl shadow-md transition-all duration-200"
               onClick={handleLiveChatClick}
             >
               Start Live Chat
