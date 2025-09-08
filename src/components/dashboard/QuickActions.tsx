@@ -1,7 +1,7 @@
 
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { CreditCard, Monitor, Phone, Database, X } from "lucide-react";
+import { X } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../ui/dialog";
 
 const QuickActions = () => {
@@ -23,33 +23,29 @@ const QuickActions = () => {
     {
       id: 'buy-bpc',
       title: 'Buy BPC',
-      icon: CreditCard,
+      emoji: '🛍',
       bgColor: 'bg-purple-100',
-      iconColor: 'text-purple-600',
       onClick: () => navigate("/buy-bpc")
     },
     {
       id: 'watch',
       title: 'Watch',
-      icon: Monitor,
+      emoji: '📺',
       bgColor: 'bg-blue-100',
-      iconColor: 'text-blue-600',
       onClick: handleWatch
     },
     {
       id: 'airtime',
       title: 'Airtime',
-      icon: Phone,
+      emoji: '☎',
       bgColor: 'bg-orange-100',
-      iconColor: 'text-orange-600',
       onClick: () => navigate("/airtime")
     },
     {
       id: 'data',
       title: 'Data',
-      icon: Database,
+      emoji: '📶',
       bgColor: 'bg-gray-100',
-      iconColor: 'text-gray-600',
       onClick: () => navigate("/data")
     }
   ];
@@ -59,7 +55,6 @@ const QuickActions = () => {
       <div className="bg-white rounded-xl p-3 mb-2 shadow-sm">
         <div className="grid grid-cols-4 gap-2">
           {quickActions.map((action) => {
-            const IconComponent = action.icon;
             return (
               <div 
                 key={action.id}
@@ -67,7 +62,7 @@ const QuickActions = () => {
                 onClick={action.onClick}
               >
                 <div className={`h-10 w-10 ${action.bgColor} rounded-lg mb-1 flex items-center justify-center`}>
-                  <IconComponent className={`h-5 w-5 ${action.iconColor}`} />
+                  <span className="text-lg">{action.emoji}</span>
                 </div>
                 <p className="text-xs font-medium text-center text-gray-800">{action.title}</p>
               </div>

@@ -1,6 +1,5 @@
 
 import React from "react";
-import { Bell, User } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { UserData } from "../../types/user";
 import TypewriterText from "../ui/TypewriterText";
@@ -18,7 +17,7 @@ const UserGreeting = ({ userData }: UserGreetingProps) => {
             <AvatarImage src={userData.profileImage} alt="Profile" className="object-cover" />
           ) : (
             <AvatarFallback className="bg-yellow-500">
-              <User className="text-white" size={16} />
+              <span className="text-white text-lg">👤</span>
             </AvatarFallback>
           )}
         </Avatar>
@@ -27,7 +26,7 @@ const UserGreeting = ({ userData }: UserGreetingProps) => {
         </h2>
       </div>
       <div className="w-8 h-8 bg-bluepay-blue rounded-full flex items-center justify-center">
-        <Bell size={16} className="text-white" />
+        <span className="text-sm">🔔</span>
       </div>
     </div>
   );

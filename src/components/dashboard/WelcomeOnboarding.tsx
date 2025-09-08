@@ -6,7 +6,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { X, CreditCard, Phone, Wallet, Zap, Gift, MessageCircle, Globe, Monitor, Database, Headphones, DollarSign, User } from "lucide-react";
+import { X } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useUserStore } from "@/stores/userStore";
 
@@ -26,31 +26,31 @@ const WelcomeOnboarding = () => {
 
   const steps = [
     {
-      icon: <Gift className="h-8 w-8 text-white" />,
+      emoji: "🎁",
       title: "Happy new month 🤗",
       description: "Welcome to the ultimate bonus claim trusted platform click on \"claim bonus\" to start earning which can be withdrawn after purchasing a BPC code.",
       buttonText: "Next →"
     },
     {
-      icon: <CreditCard className="h-8 w-8 text-white" />,
+      emoji: "🛍",
       title: "Get Your BPC Code",
       description: "To withdraw funds, you'll need to purchase a BPC Code for ₦6,200. This is a one-time purchase that unlocks all features of the app.",
       buttonText: "Next →"
     },
     {
-      icon: <Phone className="h-8 w-8 text-white" />,
+      emoji: "☎",
       title: "Airtime & Data",
       description: "You can purchase airtime and data for all major networks directly from the app. Simply select the service, enter the phone number, choose your plan, and complete your purchase.",
       buttonText: "Next →"
     },
     {
-      icon: <Wallet className="h-8 w-8 text-white" />,
+      emoji: "💰",
       title: "Withdrawal Process",
       description: "To withdraw your funds, tap the \"Withdraw\" button on your dashboard, enter your bank details and BPC Code, and submit your request. Withdrawals are processed within 24 hours.",
       buttonText: "Next →"
     },
     {
-      icon: <DollarSign className="h-8 w-8 text-white" />,
+      emoji: "💲",
       title: "Earn More",
       description: "Explore our app to discover ways to earn more! Refer friends to earn ₦500 per referral, join our communities, and take advantage of special promotions.",
       buttonText: "Get Started →",
@@ -133,7 +133,7 @@ const WelcomeOnboarding = () => {
           {/* Icon */}
           <div className="flex justify-center">
             <div className="w-16 h-16 rounded-full bg-bluepay-blue/10 flex items-center justify-center">
-              {currentStepData.icon}
+              <span className="text-3xl">{currentStepData.emoji}</span>
             </div>
           </div>
 
@@ -155,7 +155,7 @@ const WelcomeOnboarding = () => {
                 className="flex flex-col items-center gap-2 p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
               >
                 <div className="w-12 h-12 rounded-full bg-blue-100 dark:bg-blue-900 flex items-center justify-center">
-                  <Globe className="h-6 w-6 text-blue-600" />
+                  <span className="text-2xl">🌐</span>
                 </div>
                 <span className="text-xs font-medium text-gray-700 dark:text-gray-300">Communities</span>
               </button>
@@ -165,7 +165,7 @@ const WelcomeOnboarding = () => {
                 className="flex flex-col items-center gap-2 p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
               >
                 <div className="w-12 h-12 rounded-full bg-gray-100 dark:bg-gray-900 flex items-center justify-center">
-                  <Headphones className="h-6 w-6 text-gray-600" />
+                  <span className="text-2xl">📡</span>
                 </div>
                 <span className="text-xs font-medium text-gray-700 dark:text-gray-300">Support</span>
               </button>
