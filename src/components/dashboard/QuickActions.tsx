@@ -85,17 +85,15 @@ const QuickActions = () => {
             </div>
           </DialogHeader>
           <div className="aspect-video w-full">
-            <video
+            <iframe
               width="100%"
               height="100%"
-              controls
-              autoPlay
-              preload="metadata"
+              src="https://www.dailymotion.com/embed/video/x9qytu2"
+              frameBorder="0"
+              allowFullScreen
               className="rounded-b-lg"
-            >
-              <source src="https://files.fm/u/g8z57ezvwm" type="video/mp4" />
-              Your browser does not support the video tag.
-            </video>
+              title="BluPay Tutorial"
+            ></iframe>
           </div>
         </DialogContent>
       </Dialog>
