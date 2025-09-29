@@ -126,13 +126,6 @@ const Withdraw = () => {
                 ))}
               </SelectContent>
             </Select>
-            {bank && (
-              <div className="mt-2 p-2 bg-blue-50 border border-blue-200 rounded-lg">
-                <p className="text-sm text-blue-800">
-                  <span className="font-semibold">Selected Bank:</span> {bank}
-                </p>
-              </div>
-            )}
           </div>
           
           <div className="relative">
