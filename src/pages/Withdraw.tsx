@@ -36,25 +36,20 @@ const Withdraw = () => {
 
   // Mock account lookup - simulates bank API
   const mockAccountLookup = (accountNum: string, bankName: string) => {
-    const accounts: { [key: string]: { [bank: string]: string } } = {
-      "0123456789": {
-        "Access Bank": "JOHN DOE SMITH",
-        "GTBank": "MARY JANE WILLIAMS",
-        "UBA": "DAVID JOHNSON BROWN"
-      },
-      "9876543210": {
-        "Zenith Bank": "SARAH THOMPSON DAVIS",
-        "First Bank": "MICHAEL ANDERSON WILSON",
-        "FCMB": "JENNIFER TAYLOR MOORE"
-      },
-      "1234567890": {
-        "Ecobank": "ROBERT GARCIA MARTINEZ",
-        "Sterling Bank": "LINDA RODRIGUEZ HERNANDEZ",
-        "Wema Bank": "WILLIAM JACKSON THOMPSON"
-      }
-    };
+    // Generate realistic names based on account number patterns
+    const namePatterns = [
+      "JOHN DOE SMITH", "MARY JANE WILLIAMS", "DAVID JOHNSON BROWN",
+      "SARAH THOMPSON DAVIS", "MICHAEL ANDERSON WILSON", "JENNIFER TAYLOR MOORE",
+      "ROBERT GARCIA MARTINEZ", "LINDA RODRIGUEZ HERNANDEZ", "WILLIAM JACKSON THOMPSON",
+      "PATRICIA MARTIN WHITE", "CHRISTOPHER LEE HARRIS", "BARBARA CLARK LEWIS",
+      "MATTHEW WALKER HALL", "SUSAN ALLEN YOUNG", "ANTHONY KING WRIGHT",
+      "NANCY LOPEZ HILL", "MARK SCOTT GREEN", "LISA ADAMS BAKER",
+      "STEVEN GONZALEZ NELSON", "KAREN CARTER MITCHELL"
+    ];
     
-    return accounts[accountNum]?.[bankName] || null;
+    // Use account number to determine which name to return for consistency
+    const accountIndex = parseInt(accountNum) % namePatterns.length;
+    return namePatterns[accountIndex];
   };
 
   // Auto-load account name when account number and bank are provided
