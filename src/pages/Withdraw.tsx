@@ -34,22 +34,16 @@ const Withdraw = () => {
     "Brass Bank", "Carbon", "Sparkle", "Rubies Bank", "Mint Digital Bank",
   ];
 
-  // Mock account lookup - simulates bank API
+  // Mock account lookup - simulates bank API  
   const mockAccountLookup = (accountNum: string, bankName: string) => {
-    // Generate realistic names based on account number patterns
-    const namePatterns = [
-      "JOHN DOE SMITH", "MARY JANE WILLIAMS", "DAVID JOHNSON BROWN",
-      "SARAH THOMPSON DAVIS", "MICHAEL ANDERSON WILSON", "JENNIFER TAYLOR MOORE",
-      "ROBERT GARCIA MARTINEZ", "LINDA RODRIGUEZ HERNANDEZ", "WILLIAM JACKSON THOMPSON",
-      "PATRICIA MARTIN WHITE", "CHRISTOPHER LEE HARRIS", "BARBARA CLARK LEWIS",
-      "MATTHEW WALKER HALL", "SUSAN ALLEN YOUNG", "ANTHONY KING WRIGHT",
-      "NANCY LOPEZ HILL", "MARK SCOTT GREEN", "LISA ADAMS BAKER",
-      "STEVEN GONZALEZ NELSON", "KAREN CARTER MITCHELL"
-    ];
+    // Simulate real banking system - return user's actual name for their account
+    if (userData && userData.fullName) {
+      // Convert to banking format (uppercase)
+      return userData.fullName.toUpperCase();
+    }
     
-    // Use account number to determine which name to return for consistency
-    const accountIndex = parseInt(accountNum) % namePatterns.length;
-    return namePatterns[accountIndex];
+    // Fallback for demo purposes if no user data
+    return "ACCOUNT HOLDER NAME";
   };
 
   // Auto-load account name when account number and bank are provided
