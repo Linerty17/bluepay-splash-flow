@@ -1,5 +1,5 @@
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -23,6 +23,7 @@ const Withdraw = () => {
   const [amount, setAmount] = useState("");
   const [bpcCode, setBpcCode] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isLoadingAccountName, setIsLoadingAccountName] = useState(false);
 
   const nigerianBanks = [
     "Access Bank", "Zenith Bank", "First Bank", "GTBank", "UBA", "Fidelity Bank",
@@ -32,6 +33,58 @@ const Withdraw = () => {
     "Kuda Bank", "Moniepoint", "PalmPay", "OPay", "VFD Microfinance Bank",
     "Brass Bank", "Carbon", "Sparkle", "Rubies Bank", "Mint Digital Bank",
   ];
+
+  // Mock account lookup - simulates bank API
+  const mockAccountLookup = (accountNum: string, bankName: string) => {
+    const accounts: { [key: string]: { [bank: string]: string } } = {
+      "0123456789": {
+        "Access Bank": "JOHN DOE SMITH",
+        "GTBank": "MARY JANE WILLIAMS",
+        "UBA": "DAVID JOHNSON BROWN"
+      },
+      "9876543210": {
+        "Zenith Bank": "SARAH THOMPSON DAVIS",
+        "First Bank": "MICHAEL ANDERSON WILSON",
+        "FCMB": "JENNIFER TAYLOR MOORE"
+      },
+      "1234567890": {
+        "Ecobank": "ROBERT GARCIA MARTINEZ",
+        "Sterling Bank": "LINDA RODRIGUEZ HERNANDEZ",
+        "Wema Bank": "WILLIAM JACKSON THOMPSON"
+      }
+    };
+    
+    return accounts[accountNum]?.[bankName] || null;
+  };
+
+  // Auto-load account name when account number and bank are provided
+  useEffect(() => {
+    if (accountNumber.length === 10 && bank) {
+      setIsLoadingAccountName(true);
+      
+      // Simulate API call delay
+      const timer = setTimeout(() => {
+        const fetchedName = mockAccountLookup(accountNumber, bank);
+        if (fetchedName) {
+          setAccountName(fetchedName);
+          toast({
+            description: "Account name loaded successfully!",
+          });
+        } else {
+          setAccountName("");
+          toast({
+            variant: "destructive",
+            description: "Account not found. Please verify account number and bank.",
+          });
+        }
+        setIsLoadingAccountName(false);
+      }, 1500);
+
+      return () => clearTimeout(timer);
+    } else {
+      setAccountName("");
+    }
+  }, [accountNumber, bank]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -98,8 +151,14 @@ const Withdraw = () => {
               value={accountName}
               onChange={(e) => setAccountName(e.target.value)}
               className="w-full border-2 border-blue-600 rounded-lg p-3 text-base"
-              placeholder="Account Name"
+              placeholder={isLoadingAccountName ? "Loading account name..." : "Account Name"}
+              disabled={isLoadingAccountName}
             />
+            {isLoadingAccountName && (
+              <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+                <div className="w-4 h-4 border-2 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+              </div>
+            )}
           </div>
           
           <div className="relative">
