@@ -55,7 +55,7 @@ const BuyBPCConfirmation = () => {
             </div>
           </div>
           <div className="text-right">
-            <p className="text-2xl font-bold">NGN 6,200</p>
+            <p className="text-2xl font-bold">NGN 8,750</p>
           </div>
         </div>
         
