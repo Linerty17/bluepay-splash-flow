@@ -6,7 +6,6 @@ import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
 import { useUserStore } from "../stores/userStore";
 import { useToast } from "@/hooks/use-toast";
-import GlowingBluepay from "@/components/ui/GlowingBluepay";
 
 const Register = () => {
   const navigate = useNavigate();
@@ -47,16 +46,11 @@ const Register = () => {
     if (referralCode) {
       toast({
         title: "Registration Successful!",
-        description: `Welcome! Your ₦20,000 referral bonus will be credited shortly.`,
-      });
-    } else {
-      toast({
-        title: "Registration Successful!",
-        description: "Welcome to BLUEPAY!",
+        description: `Welcome! Your ₦20,000 referral bonus will be credited after PIN setup.`,
       });
     }
     
-    navigate("/dashboard");
+    navigate("/setup-pin");
   };
 
   const handleHelpClick = () => {
@@ -76,7 +70,7 @@ const Register = () => {
 
       <div className="flex-1 flex flex-col justify-center p-4">
         <div className="max-w-md w-full mx-auto">
-          <h1 className="text-2xl font-bold mb-2 text-white text-center"><GlowingBluepay /></h1>
+          <h1 className="text-2xl font-bold mb-2 text-white text-center">BLUEPAY</h1>
           <h2 className="text-xl font-bold mb-3 text-white">Welcome!</h2>
           
           {referralCode && (
@@ -147,7 +141,7 @@ const Register = () => {
           <div className="mt-6 text-center">
             <span className="text-gray-200 text-sm">Already have an account? </span>
             <button 
-              onClick={() => navigate("/dashboard")} 
+              onClick={() => navigate("/pin")} 
               className="text-white font-medium underline text-sm"
             >
               Sign in
