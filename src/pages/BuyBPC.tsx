@@ -29,7 +29,11 @@ const BuyBPC = () => {
     }
     
     setIsSubmitting(true);
-    navigate("/buy-bpc/processing");
+    
+    // Simulate processing delay
+    setTimeout(() => {
+      navigate("/buy-bpc/processing");
+    }, 1000);
   };
 
   return (
@@ -89,7 +93,12 @@ const BuyBPC = () => {
             disabled={isSubmitting}
             className="w-full bg-blue-600 hover:bg-blue-700 text-lg py-4"
           >
-            {isSubmitting ? "Processing..." : "Pay"}
+            {isSubmitting ? (
+              <span className="flex items-center justify-center gap-2">
+                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                Processing...
+              </span>
+            ) : "Pay"}
           </Button>
           
           <p className="text-center text-gray-500 text-sm">

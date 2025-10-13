@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { ArrowLeft, Copy } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "@/hooks/use-toast";
+import GlowingBluepay from "@/components/ui/GlowingBluepay";
 
 const BuyBPCTransfer = () => {
   const navigate = useNavigate();
@@ -28,7 +29,7 @@ const BuyBPCTransfer = () => {
         <button className="text-xl">
           <span className="sr-only">Menu</span>
         </button>
-        <h1 className="text-2xl font-semibold">BLUEPAY2025</h1>
+        <h1 className="text-2xl font-semibold"><GlowingBluepay text="BLUEPAY 2025" /></h1>
         <div className="w-8 h-8">
           <span className="sr-only">Notifications</span>
         </div>

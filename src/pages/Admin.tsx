@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from "react";
 import { MessageCircle } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import GlowingBluepay from "@/components/ui/GlowingBluepay";
 
 const Admin = () => {
   const navigate = useNavigate();
@@ -56,7 +57,7 @@ const Admin = () => {
                 className="w-full h-full object-contain"
               />
             </div>
-            <h1 className="text-white text-3xl font-bold">BLUEPAY</h1>
+            <h1 className="text-white text-3xl font-bold"><GlowingBluepay /></h1>
           </div>
           
           {/* Admin section */}

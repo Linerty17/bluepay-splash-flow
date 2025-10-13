@@ -24,6 +24,7 @@ const Withdraw = () => {
   const [bpcCode, setBpcCode] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isLoadingAccountName, setIsLoadingAccountName] = useState(false);
+  const [isSubmittingWithdrawal, setIsSubmittingWithdrawal] = useState(false);
 
   const nigerianBanks = [
     "Access Bank", "Zenith Bank", "First Bank", "GTBank", "UBA", "Fidelity Bank",
@@ -77,14 +78,14 @@ const Withdraw = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    setIsSubmitting(true);
+    setIsSubmittingWithdrawal(true);
     
     if (!accountName || !accountNumber || !bank || !amount) {
       toast({
         variant: "destructive",
         description: "Please fill in all required fields",
       });
-      setIsSubmitting(false);
+      setIsSubmittingWithdrawal(false);
       return;
     }
 
@@ -93,7 +94,7 @@ const Withdraw = () => {
         variant: "destructive",
         description: "Invalid BPC code. Please enter a valid code.",
       });
-      setIsSubmitting(false);
+      setIsSubmittingWithdrawal(false);
       return;
     }
 
@@ -209,10 +210,15 @@ const Withdraw = () => {
           
           <Button 
             type="submit"
-            disabled={isSubmitting}
+            disabled={isSubmittingWithdrawal || isLoadingAccountName}
             className="w-full bg-blue-600 hover:bg-blue-700 text-base py-4 mt-3"
           >
-            {isSubmitting ? "Processing..." : "Submit"}
+            {isSubmittingWithdrawal ? (
+              <span className="flex items-center justify-center gap-2">
+                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                Processing...
+              </span>
+            ) : "Submit"}
           </Button>
         </form>
       </div>
