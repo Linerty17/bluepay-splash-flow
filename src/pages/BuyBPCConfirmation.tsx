@@ -5,7 +5,6 @@ import { AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "@/hooks/use-toast";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import GlowingBluepay from "@/components/ui/GlowingBluepay";
 
 const BuyBPCConfirmation = () => {
   const navigate = useNavigate();

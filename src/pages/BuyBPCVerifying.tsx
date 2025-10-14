@@ -1,7 +1,6 @@
 
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import GlowingBluepay from "@/components/ui/GlowingBluepay";
 
 const BuyBPCVerifying = () => {
   const navigate = useNavigate();
@@ -28,7 +27,7 @@ const BuyBPCVerifying = () => {
         <button className="text-lg">
           <span className="sr-only">Menu</span>
         </button>
-        <h1 className="text-xl font-semibold"><GlowingBluepay /></h1>
+        <h1 className="text-xl font-semibold">BLUEPAY</h1>
         <div className="w-6 h-6">
           <span className="sr-only">Notifications</span>
         </div>

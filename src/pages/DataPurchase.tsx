@@ -21,7 +21,6 @@ const DataPurchase = () => {
   const [network, setNetwork] = useState("");
   const [dataBundle, setDataBundle] = useState("");
   const [bpcCode, setBpcCode] = useState("");
-  const [isSubmitting, setIsSubmitting] = useState(false);
   
   const networks = ["MTN", "Airtel", "Glo", "9Mobile"];
   
@@ -70,7 +69,6 @@ const DataPurchase = () => {
       return;
     }
 
-    setIsSubmitting(true);
     updateBalance(-selectedBundle.price);
     
     addTransaction({
@@ -86,9 +84,7 @@ const DataPurchase = () => {
       description: "Data purchase successful!",
     });
     
-    setTimeout(() => {
-      navigate("/dashboard");
-    }, 1000);
+    navigate("/dashboard");
   };
 
   return (
@@ -165,15 +161,9 @@ const DataPurchase = () => {
           
           <Button 
             type="submit"
-            disabled={isSubmitting}
             className="w-full bg-blue-600 hover:bg-blue-700 text-base py-4 mt-3"
           >
-            {isSubmitting ? (
-              <span className="flex items-center justify-center gap-2">
-                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                Processing...
-              </span>
-            ) : "Purchase Data"}
+            Purchase Data
           </Button>
         </form>
       </div>

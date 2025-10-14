@@ -21,7 +21,6 @@ const AirtimePurchase = () => {
   const [amount, setAmount] = useState("");
   const [network, setNetwork] = useState("");
   const [bpcCode, setBpcCode] = useState("");
-  const [isSubmitting, setIsSubmitting] = useState(false);
   
   const networks = ["MTN", "Airtel", "Glo", "9Mobile"];
   
@@ -52,7 +51,6 @@ const AirtimePurchase = () => {
       return;
     }
 
-    setIsSubmitting(true);
     const amountValue = parseFloat(amount);
     
     updateBalance(-amountValue);
@@ -70,9 +68,7 @@ const AirtimePurchase = () => {
       description: "Airtime purchase successful!",
     });
     
-    setTimeout(() => {
-      navigate("/dashboard");
-    }, 1000);
+    navigate("/dashboard");
   };
 
   return (
@@ -144,15 +140,9 @@ const AirtimePurchase = () => {
           
           <Button 
             type="submit"
-            disabled={isSubmitting}
             className="w-full bg-blue-600 hover:bg-blue-700 text-base py-4 mt-3"
           >
-            {isSubmitting ? (
-              <span className="flex items-center justify-center gap-2">
-                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                Processing...
-              </span>
-            ) : "Purchase Airtime"}
+            Purchase Airtime
           </Button>
         </form>
       </div>
