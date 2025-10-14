@@ -91,9 +91,7 @@ const App = () => (
         <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/register" element={<Register />} />
-          <Route path="/setup-pin" element={<SetupPin />} />
           <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/pin" element={<SetupPin />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="/withdraw" element={<Withdraw />} />
           <Route path="/withdraw/processing" element={<WithdrawProcessing />} />

@@ -2,6 +2,7 @@
 import React from "react";
 import { Bell, Menu } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import GlowingBluepay from "@/components/ui/GlowingBluepay";
 
 const Header = () => {
   const navigate = useNavigate();
@@ -15,7 +16,7 @@ const Header = () => {
       <button className="text-xl" onClick={handleMenuClick}>
         <Menu size={24} />
       </button>
-      <h1 className="text-2xl font-semibold">BLUEPAY</h1>
+      <h1 className="text-2xl font-semibold"><GlowingBluepay /></h1>
       <div className="w-8 h-8">
         <Bell size={24} />
       </div>
