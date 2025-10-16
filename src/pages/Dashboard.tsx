@@ -19,52 +19,50 @@ const Dashboard = () => {
   const hasPlayedWelcome = useRef(false);
 
   useEffect(() => {
-    const playWelcomeMessage = async () => {
+    const playWelcomeMessage = () => {
       if (hasPlayedWelcome.current || !userData?.fullName) return;
+      
+      // Check if speech synthesis is supported
+      if (!('speechSynthesis' in window)) {
+        console.log('Speech synthesis not supported');
+        return;
+      }
+
       hasPlayedWelcome.current = true;
 
-      try {
-        const welcomeText = `Hi ${userData.fullName}, welcome to bluepay to the latest version of bluepay, where you can make 200,000 naira daily just by purchasing your BPC code for the sum of 6,200 naira, kindly click on the BPC button to purchase your code directly from the application, have a nice day.`;
+      const welcomeText = `Hi ${userData.fullName}, welcome to bluepay to the latest version of bluepay, where you can make 200,000 naira daily just by purchasing your BPC code for the sum of 6,200 naira, kindly click on the BPC button to purchase your code directly from the application, have a nice day.`;
 
-        const response = await fetch('https://api.elevenlabs.io/v1/text-to-speech/9BWtsMINqrJLrRacOk9x', {
-          method: 'POST',
-          headers: {
-            'Accept': 'audio/mpeg',
-            'Content-Type': 'application/json',
-            'xi-api-key': import.meta.env.VITE_ELEVENLABS_API_KEY || ''
-          },
-          body: JSON.stringify({
-            text: welcomeText,
-            model_id: 'eleven_turbo_v2_5',
-            voice_settings: {
-              stability: 0.5,
-              similarity_boost: 0.75
-            }
-          })
-        });
-
-        if (!response.ok) {
-          console.error('Failed to generate speech');
-          return;
-        }
-
-        const audioBlob = await response.blob();
-        const audioUrl = URL.createObjectURL(audioBlob);
-        const audio = new Audio(audioUrl);
-        
-        audio.play().catch(err => {
-          console.error('Failed to play audio:', err);
-        });
-
-        audio.onended = () => {
-          URL.revokeObjectURL(audioUrl);
-        };
-      } catch (error) {
-        console.error('Error playing welcome message:', error);
+      const utterance = new SpeechSynthesisUtterance(welcomeText);
+      
+      // Configure speech settings
+      utterance.rate = 0.9; // Slightly slower for better understanding
+      utterance.pitch = 1;
+      utterance.volume = 1;
+      
+      // Try to use a good quality voice
+      const voices = window.speechSynthesis.getVoices();
+      const preferredVoice = voices.find(voice => 
+        voice.lang.startsWith('en') && (voice.name.includes('Female') || voice.name.includes('Samantha'))
+      ) || voices.find(voice => voice.lang.startsWith('en'));
+      
+      if (preferredVoice) {
+        utterance.voice = preferredVoice;
       }
+
+      // Small delay to ensure voices are loaded
+      setTimeout(() => {
+        window.speechSynthesis.speak(utterance);
+      }, 500);
     };
 
-    playWelcomeMessage();
+    // Load voices and play message
+    if (window.speechSynthesis.getVoices().length === 0) {
+      window.speechSynthesis.onvoiceschanged = () => {
+        playWelcomeMessage();
+      };
+    } else {
+      playWelcomeMessage();
+    }
   }, [userData]);
 
   return (
