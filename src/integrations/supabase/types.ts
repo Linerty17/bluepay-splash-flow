@@ -23,6 +23,8 @@ export type Database = {
           profile_image: string | null
           referral_code: string
           referral_count: number
+          referral_earnings: number
+          referral_rate: number
           referred_by: string | null
           updated_at: string
         }
@@ -34,6 +36,8 @@ export type Database = {
           profile_image?: string | null
           referral_code: string
           referral_count?: number
+          referral_earnings?: number
+          referral_rate?: number
           referred_by?: string | null
           updated_at?: string
         }
@@ -45,6 +49,8 @@ export type Database = {
           profile_image?: string | null
           referral_code?: string
           referral_count?: number
+          referral_earnings?: number
+          referral_rate?: number
           referred_by?: string | null
           updated_at?: string
         }
@@ -52,6 +58,94 @@ export type Database = {
           {
             foreignKeyName: "profiles_referred_by_fkey"
             columns: ["referred_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      referral_upgrades: {
+        Row: {
+          created_at: string
+          id: string
+          new_rate: number
+          payment_amount: number
+          payment_proof: string | null
+          payment_status: string | null
+          previous_rate: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          new_rate: number
+          payment_amount: number
+          payment_proof?: string | null
+          payment_status?: string | null
+          previous_rate: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          new_rate?: number
+          payment_amount?: number
+          payment_proof?: string | null
+          payment_status?: string | null
+          previous_rate?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "referral_upgrades_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      withdrawal_requests: {
+        Row: {
+          account_name: string
+          account_number: string
+          amount: number
+          bank_name: string
+          created_at: string
+          id: string
+          status: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          account_name: string
+          account_number: string
+          amount: number
+          bank_name: string
+          created_at?: string
+          id?: string
+          status?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          account_name?: string
+          account_number?: string
+          amount?: number
+          bank_name?: string
+          created_at?: string
+          id?: string
+          status?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "withdrawal_requests_user_id_fkey"
+            columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
