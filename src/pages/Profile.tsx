@@ -1,12 +1,13 @@
 import React, { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, User, Upload, Sun, Moon, Circle, CircleHelp, Smartphone, Download, ChevronRight, RotateCcw } from "lucide-react";
+import { ArrowLeft, User, Upload, Sun, Moon, Circle, CircleHelp, Smartphone, Download, ChevronRight, RotateCcw, Copy, Share2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useUserStore } from "../stores/userStore";
 import { useToast } from "@/components/ui/use-toast";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import ResetBalance from "../components/ResetBalance";
+import { supabase } from "@/integrations/supabase/client";
 
 const Profile = () => {
   const navigate = useNavigate();
@@ -14,7 +15,30 @@ const Profile = () => {
   const { userData, setUserData, themeMode, setThemeMode } = useUserStore();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isResetBalanceOpen, setIsResetBalanceOpen] = useState(false);
+  const [referralCode, setReferralCode] = useState<string>("");
+  const [referralCount, setReferralCount] = useState<number>(0);
   
+  // Fetch user profile data
+  useEffect(() => {
+    const fetchProfile = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        const { data: profile } = await supabase
+          .from("profiles")
+          .select("referral_code, referral_count")
+          .eq("id", user.id)
+          .single();
+        
+        if (profile) {
+          setReferralCode(profile.referral_code);
+          setReferralCount(profile.referral_count);
+        }
+      }
+    };
+    
+    fetchProfile();
+  }, []);
+
   // Apply theme on component mount and when themeMode changes
   useEffect(() => {
     applyTheme(themeMode);
@@ -104,6 +128,32 @@ const Profile = () => {
     });
   };
 
+  const handleCopyReferralCode = () => {
+    navigator.clipboard.writeText(referralCode);
+    toast({
+      title: "Copied!",
+      description: "Referral code copied to clipboard",
+    });
+  };
+
+  const handleShareReferralLink = () => {
+    const referralLink = `${window.location.origin}/register?ref=${referralCode}`;
+    
+    if (navigator.share) {
+      navigator.share({
+        title: "Join BluePay",
+        text: `Use my referral code ${referralCode} to get ₦20,000 bonus when you sign up!`,
+        url: referralLink,
+      }).catch((error) => console.log("Error sharing:", error));
+    } else {
+      navigator.clipboard.writeText(referralLink);
+      toast({
+        title: "Link Copied!",
+        description: "Referral link copied to clipboard",
+      });
+    }
+  };
+
   return (
     <div className="min-h-screen bg-bluepay-blue text-white">
       <header className="p-3 flex items-center">
@@ -167,6 +217,35 @@ const Profile = () => {
               <p className="text-sm">Basic</p>
               <div className="h-px bg-gray-200 my-2"></div>
             </div>
+
+            {referralCode && (
+              <div className="bg-gradient-to-r from-blue-50 to-purple-50 p-4 rounded-lg border border-blue-200">
+                <p className="text-gray-700 font-semibold mb-2 text-sm">Your Referral Code</p>
+                <div className="flex items-center justify-between mb-3">
+                  <code className="text-2xl font-bold text-blue-600">{referralCode}</code>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={handleCopyReferralCode}
+                    className="flex items-center gap-1"
+                  >
+                    <Copy className="h-3 w-3" />
+                    Copy
+                  </Button>
+                </div>
+                <p className="text-xs text-gray-600 mb-2">
+                  You've referred <span className="font-bold text-blue-600">{referralCount}</span> {referralCount === 1 ? 'person' : 'people'}
+                </p>
+                <Button
+                  onClick={handleShareReferralLink}
+                  className="w-full bg-blue-600 hover:bg-blue-700 text-white flex items-center justify-center gap-2"
+                  size="sm"
+                >
+                  <Share2 className="h-4 w-4" />
+                  Share Referral Link
+                </Button>
+              </div>
+            )}
 
             <div>
               <div 

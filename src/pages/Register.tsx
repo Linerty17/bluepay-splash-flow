@@ -3,9 +3,10 @@ import React, { useState, useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Loader2 } from "lucide-react";
 import { useUserStore } from "../stores/userStore";
 import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 
 const Register = () => {
   const navigate = useNavigate();
@@ -13,11 +14,13 @@ const Register = () => {
   const { setUserData } = useUserStore();
   const [searchParams] = useSearchParams();
   const [referralCode, setReferralCode] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
     fullName: "",
     email: "",
     password: "",
     phoneNumber: "",
+    enteredReferralCode: "",
   });
 
   useEffect(() => {
@@ -36,21 +39,76 @@ const Register = () => {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setUserData({
-      fullName: formData.fullName,
-      email: formData.email
-    });
-    
-    if (referralCode) {
-      toast({
-        title: "Registration Successful!",
-        description: `Welcome! Your ₦20,000 referral bonus will be credited after PIN setup.`,
+    setIsLoading(true);
+
+    try {
+      // Sign up with Supabase Auth
+      const { data: authData, error: signUpError } = await supabase.auth.signUp({
+        email: formData.email,
+        password: formData.password,
+        options: {
+          data: {
+            fullName: formData.fullName,
+            phoneNumber: formData.phoneNumber,
+          },
+          emailRedirectTo: `${window.location.origin}/dashboard`,
+        },
       });
+
+      if (signUpError) throw signUpError;
+
+      if (!authData.user) {
+        throw new Error("Failed to create user account");
+      }
+
+      // Process referral code if provided (from URL or input field)
+      const codeToUse = referralCode || formData.enteredReferralCode;
+      if (codeToUse) {
+        const { error: referralError } = await supabase.rpc("process_referral", {
+          referrer_code: codeToUse,
+          new_user_id: authData.user.id,
+        });
+
+        if (referralError) {
+          console.error("Referral processing error:", referralError);
+          toast({
+            title: "Registration Successful",
+            description: "Account created, but referral code could not be applied.",
+            variant: "default",
+          });
+        } else {
+          toast({
+            title: "Registration Successful!",
+            description: `Welcome! Referral code ${codeToUse} applied successfully.`,
+          });
+        }
+      } else {
+        toast({
+          title: "Registration Successful!",
+          description: "Your account has been created.",
+        });
+      }
+
+      // Store user data locally
+      setUserData({
+        fullName: formData.fullName,
+        email: formData.email,
+      });
+
+      // Navigate to dashboard
+      navigate("/dashboard");
+    } catch (error: any) {
+      console.error("Registration error:", error);
+      toast({
+        title: "Registration Failed",
+        description: error.message || "Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
     }
-    
-    navigate("/setup-pin");
   };
 
   const handleHelpClick = () => {
@@ -126,15 +184,33 @@ const Register = () => {
               />
             </div>
 
+            {!referralCode && (
+              <Input
+                name="enteredReferralCode"
+                placeholder="Referral Code (Optional)"
+                value={formData.enteredReferralCode}
+                onChange={handleChange}
+                className="rounded-md bg-white/10 border-white/20 px-3 py-2 text-white placeholder:text-gray-300"
+              />
+            )}
+
             <p className="text-xs text-gray-200">
               Any further actions indicates that you agree with our terms & conditions!
             </p>
 
             <Button
               type="submit"
-              className="w-full bg-white hover:bg-gray-100 text-bluepay-blue py-2 font-bold rounded-full"
+              disabled={isLoading}
+              className="w-full bg-white hover:bg-gray-100 text-bluepay-blue py-2 font-bold rounded-full disabled:opacity-50"
             >
-              Create account
+              {isLoading ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Creating account...
+                </>
+              ) : (
+                "Create account"
+              )}
             </Button>
           </form>
 
