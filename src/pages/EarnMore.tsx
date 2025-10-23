@@ -8,6 +8,26 @@ import { supabase } from "@/integrations/supabase/client";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { z } from "zod";
+
+const withdrawalSchema = z.object({
+  amount: z.number()
+    .min(170000, 'Minimum withdrawal is ₦170,000')
+    .max(10000000, 'Maximum withdrawal is ₦10,000,000')
+    .positive('Amount must be positive'),
+  accountName: z.string()
+    .trim()
+    .min(3, 'Account name too short')
+    .max(100, 'Account name too long')
+    .regex(/^[a-zA-Z\s]+$/, 'Account name must contain only letters'),
+  accountNumber: z.string()
+    .trim()
+    .length(10, 'Account number must be exactly 10 digits')
+    .regex(/^\d{10}$/, 'Account number must contain only digits'),
+  bankName: z.string()
+    .trim()
+    .min(1, 'Please select a bank')
+});
 
 const EarnMore = () => {
   const navigate = useNavigate();
@@ -61,7 +81,6 @@ const EarnMore = () => {
         setReferralRate(Number(data.referral_rate) || 15000);
       }
     } catch (error) {
-      console.error('Error fetching referral data:', error);
       toast({
         title: "Error",
         description: "Failed to load referral data",
@@ -120,26 +139,16 @@ const EarnMore = () => {
   };
 
   const handleWithdraw = async () => {
-    if (referralEarnings < 170000) {
-      toast({
-        title: "Insufficient Earnings",
-        description: "You need at least ₦170,000 to withdraw",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    if (!accountName || !accountNumber || !bankName) {
-      toast({
-        title: "Missing Information",
-        description: "Please fill in all payment details",
-        variant: "destructive",
-      });
-      return;
-    }
-
     setSubmitting(true);
     try {
+      // Validate inputs
+      const validated = withdrawalSchema.parse({
+        amount: referralEarnings,
+        accountName: accountName.trim(),
+        accountNumber: accountNumber.trim(),
+        bankName: bankName.trim()
+      });
+
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error("Not authenticated");
 
@@ -147,10 +156,10 @@ const EarnMore = () => {
         .from('withdrawal_requests')
         .insert({
           user_id: user.id,
-          amount: referralEarnings,
-          account_name: accountName,
-          account_number: accountNumber,
-          bank_name: bankName,
+          amount: validated.amount,
+          account_name: validated.accountName,
+          account_number: validated.accountNumber,
+          bank_name: validated.bankName,
         });
 
       if (error) throw error;
@@ -165,12 +174,19 @@ const EarnMore = () => {
       setAccountNumber("");
       setBankName("");
     } catch (error) {
-      console.error('Error submitting withdrawal:', error);
-      toast({
-        title: "Error",
-        description: "Failed to submit withdrawal request",
-        variant: "destructive",
-      });
+      if (error instanceof z.ZodError) {
+        toast({
+          title: "Validation Error",
+          description: error.errors[0].message,
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          title: "Error",
+          description: "Failed to submit withdrawal request",
+          variant: "destructive",
+        });
+      }
     } finally {
       setSubmitting(false);
     }
@@ -178,6 +194,16 @@ const EarnMore = () => {
 
   const handleUpgrade = async () => {
     if (!selectedUpgrade) return;
+
+    // Validate upgrade amount is valid
+    if (![25000, 30000].includes(selectedUpgrade)) {
+      toast({
+        title: "Invalid Upgrade",
+        description: "Please select a valid upgrade tier",
+        variant: "destructive",
+      });
+      return;
+    }
 
     setSubmitting(true);
     try {
@@ -204,7 +230,6 @@ const EarnMore = () => {
       setShowUpgradeModal(false);
       setSelectedUpgrade(null);
     } catch (error) {
-      console.error('Error submitting upgrade:', error);
       toast({
         title: "Error",
         description: "Failed to submit upgrade request",

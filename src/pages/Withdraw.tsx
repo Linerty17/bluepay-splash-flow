@@ -13,6 +13,29 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { z } from "zod";
+
+const withdrawalSchema = z.object({
+  accountName: z.string()
+    .trim()
+    .min(3, 'Account name too short')
+    .max(100, 'Account name too long')
+    .regex(/^[a-zA-Z\s]+$/, 'Account name must contain only letters'),
+  accountNumber: z.string()
+    .trim()
+    .length(10, 'Account number must be exactly 10 digits')
+    .regex(/^\d{10}$/, 'Account number must contain only digits'),
+  bank: z.string()
+    .trim()
+    .min(1, 'Please select a bank'),
+  amount: z.number()
+    .positive('Amount must be positive')
+    .min(100, 'Minimum withdrawal is ₦100')
+    .max(10000000, 'Maximum withdrawal is ₦10,000,000'),
+  bpcCode: z.string()
+    .trim()
+    .min(1, 'BPC code is required')
+});
 
 const Withdraw = () => {
   const navigate = useNavigate();
@@ -79,49 +102,71 @@ const Withdraw = () => {
     e.preventDefault();
     setIsSubmitting(true);
     
-    if (!accountName || !accountNumber || !bank || !amount) {
-      toast({
-        variant: "destructive",
-        description: "Please fill in all required fields",
+    try {
+      // Validate all inputs
+      const validated = withdrawalSchema.parse({
+        accountName: accountName.trim(),
+        accountNumber: accountNumber.trim(),
+        bank: bank.trim(),
+        amount: parseFloat(amount),
+        bpcCode: bpcCode.trim()
       });
-      setIsSubmitting(false);
-      return;
-    }
 
-    if (bpcCode !== "BPC34853322") {
-      toast({
-        variant: "destructive",
-        description: "Invalid BPC code. Please enter a valid code.",
-      });
-      setIsSubmitting(false);
-      return;
-    }
-
-    const amountValue = parseFloat(amount);
-    
-    updateBalance(-amountValue);
-    
-    addTransaction({
-      id: Date.now(),
-      type: "Bank Transfer",
-      amount: `-₦${amountValue.toLocaleString()}`,
-      date: new Date().toLocaleString(),
-      status: "Completed",
-      recipient: `${accountName} - ${accountNumber} (${bank})`,
-    });
-    
-    toast({
-      description: "Transfer initiated successfully!",
-    });
-    
-    navigate("/withdraw/processing", {
-      state: {
-        amount: amountValue,
-        accountName,
-        accountNumber,
-        bank
+      if (validated.bpcCode !== "BPC34853322") {
+        toast({
+          variant: "destructive",
+          description: "Invalid BPC code. Please enter a valid code.",
+        });
+        setIsSubmitting(false);
+        return;
       }
-    });
+
+      if (validated.amount > balance) {
+        toast({
+          variant: "destructive",
+          description: "Insufficient balance for this withdrawal",
+        });
+        setIsSubmitting(false);
+        return;
+      }
+      
+      updateBalance(-validated.amount);
+      
+      addTransaction({
+        id: Date.now(),
+        type: "Bank Transfer",
+        amount: `-₦${validated.amount.toLocaleString()}`,
+        date: new Date().toLocaleString(),
+        status: "Completed",
+        recipient: `${validated.accountName} - ${validated.accountNumber} (${validated.bank})`,
+      });
+      
+      toast({
+        description: "Transfer initiated successfully!",
+      });
+      
+      navigate("/withdraw/processing", {
+        state: {
+          amount: validated.amount,
+          accountName: validated.accountName,
+          accountNumber: validated.accountNumber,
+          bank: validated.bank
+        }
+      });
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        toast({
+          variant: "destructive",
+          description: error.errors[0].message,
+        });
+      } else {
+        toast({
+          variant: "destructive",
+          description: "An error occurred. Please try again.",
+        });
+      }
+      setIsSubmitting(false);
+    }
   };
 
   return (

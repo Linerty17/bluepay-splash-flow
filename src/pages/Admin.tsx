@@ -1,20 +1,71 @@
-
 import React, { useState, useEffect } from "react";
-import { MessageCircle } from "lucide-react";
+import { MessageCircle, Loader2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 
 const Admin = () => {
   const navigate = useNavigate();
+  const { toast } = useToast();
   const [showSidebar, setShowSidebar] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Show sidebar with a slight delay for animation
-    const timer = setTimeout(() => {
-      setShowSidebar(true);
-    }, 300); // Slowed down animation for better UX
-    
-    return () => clearTimeout(timer);
+    checkAdminAccess();
   }, []);
+
+  const checkAdminAccess = async () => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        toast({
+          title: "Authentication Required",
+          description: "Please log in to access this page",
+          variant: "destructive",
+        });
+        navigate("/");
+        return;
+      }
+
+      // Check admin role from database
+      const { data: roleData, error } = await supabase
+        .from('user_roles')
+        .select('role')
+        .eq('user_id', user.id)
+        .eq('role', 'admin')
+        .maybeSingle();
+
+      if (error) {
+        console.error('Error checking admin role:', error);
+      }
+
+      if (!roleData) {
+        toast({
+          title: "Access Denied",
+          description: "Admin privileges required",
+          variant: "destructive",
+        });
+        navigate("/dashboard");
+        return;
+      }
+
+      setIsAdmin(true);
+      // Show sidebar after successful auth
+      setTimeout(() => {
+        setShowSidebar(true);
+      }, 300);
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to verify access",
+        variant: "destructive",
+      });
+      navigate("/dashboard");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleBackToDashboard = () => {
     setShowSidebar(false);
@@ -26,6 +77,18 @@ const Admin = () => {
   const handleAdminClick = () => {
     window.open("https://t.me/Officialbluepay", "_blank");
   };
+
+  if (loading) {
+    return (
+      <div className="flex h-screen items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
+    );
+  }
+
+  if (!isAdmin) {
+    return null;
+  }
 
   return (
     <div className="flex h-screen">
