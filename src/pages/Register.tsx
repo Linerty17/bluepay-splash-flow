@@ -26,10 +26,12 @@ const Register = () => {
   useEffect(() => {
     const refCode = searchParams.get('ref');
     if (refCode) {
-      setReferralCode(refCode);
+      const upperRefCode = refCode.trim().toUpperCase();
+      setReferralCode(upperRefCode);
+      setFormData((prev) => ({ ...prev, enteredReferralCode: upperRefCode }));
       toast({
         title: "Referral Code Applied!",
-        description: `Using referral code: ${refCode}. You'll get ₦20,000 bonus after registration!`,
+        description: `Using referral code: ${upperRefCode}`,
       });
     }
   }, [searchParams, toast]);
@@ -63,8 +65,8 @@ const Register = () => {
         throw new Error("Failed to create user account");
       }
 
-      // Process referral code if provided (from URL or input field)
-      const codeToUse = referralCode || formData.enteredReferralCode;
+      // Process referral code if provided
+      const codeToUse = formData.enteredReferralCode.trim().toUpperCase();
       if (codeToUse) {
         const { error: referralError } = await supabase.rpc("process_referral", {
           referrer_code: codeToUse,
@@ -72,7 +74,6 @@ const Register = () => {
         });
 
         if (referralError) {
-          console.error("Referral processing error:", referralError);
           toast({
             title: "Registration Successful",
             description: "Account created, but referral code could not be applied.",
@@ -81,7 +82,7 @@ const Register = () => {
         } else {
           toast({
             title: "Registration Successful!",
-            description: `Welcome! Referral code ${codeToUse} applied successfully.`,
+            description: `Welcome! Your referrer has been credited.`,
           });
         }
       } else {
@@ -134,9 +135,9 @@ const Register = () => {
           {referralCode && (
             <div className="bg-green-500/20 border border-green-400 rounded-lg p-2 mb-3">
               <p className="text-green-100 text-xs">
-                🎉 Using referral code: <span className="font-bold">{referralCode}</span>
+                🎉 Referral code detected: <span className="font-bold">{referralCode}</span>
               </p>
-              <p className="text-green-100 text-xs">You'll get ₦20,000 bonus after registration!</p>
+              <p className="text-green-100 text-xs">Your referrer will be credited when you register!</p>
             </div>
           )}
           
@@ -184,15 +185,14 @@ const Register = () => {
               />
             </div>
 
-            {!referralCode && (
-              <Input
-                name="enteredReferralCode"
-                placeholder="Referral Code (Optional)"
-                value={formData.enteredReferralCode}
-                onChange={handleChange}
-                className="rounded-md bg-white/10 border-white/20 px-3 py-2 text-white placeholder:text-gray-300"
-              />
-            )}
+            <Input
+              name="enteredReferralCode"
+              placeholder="Referral Code (Optional)"
+              value={formData.enteredReferralCode}
+              onChange={handleChange}
+              className="rounded-md bg-white/10 border-white/20 px-3 py-2 text-white placeholder:text-gray-300 uppercase"
+              maxLength={6}
+            />
 
             <p className="text-xs text-gray-200">
               Any further actions indicates that you agree with our terms & conditions!
