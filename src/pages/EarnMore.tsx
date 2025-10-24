@@ -1,33 +1,10 @@
 import React, { useState, useEffect } from "react";
-import { ArrowLeft, TrendingUp, Users, Copy, Share2, CheckCircle, Wallet, ArrowUpCircle, Loader2 } from "lucide-react";
+import { ArrowLeft, TrendingUp, Users, Copy, Share2, CheckCircle, Wallet, ArrowUpCircle, Loader2, DollarSign } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { z } from "zod";
-
-const withdrawalSchema = z.object({
-  amount: z.number()
-    .min(170000, 'Minimum withdrawal is ₦170,000')
-    .max(10000000, 'Maximum withdrawal is ₦10,000,000')
-    .positive('Amount must be positive'),
-  accountName: z.string()
-    .trim()
-    .min(3, 'Account name too short')
-    .max(100, 'Account name too long')
-    .regex(/^[a-zA-Z\s]+$/, 'Account name must contain only letters'),
-  accountNumber: z.string()
-    .trim()
-    .length(10, 'Account number must be exactly 10 digits')
-    .regex(/^\d{10}$/, 'Account number must contain only digits'),
-  bankName: z.string()
-    .trim()
-    .min(1, 'Please select a bank')
-});
 
 const EarnMore = () => {
   const navigate = useNavigate();
@@ -37,17 +14,8 @@ const EarnMore = () => {
   const [referralCount, setReferralCount] = useState(0);
   const [referralEarnings, setReferralEarnings] = useState<number>(0);
   const [referralRate, setReferralRate] = useState<number>(15000);
-  const [showWithdrawModal, setShowWithdrawModal] = useState(false);
-  const [showUpgradeModal, setShowUpgradeModal] = useState(false);
-  const [submitting, setSubmitting] = useState(false);
-  
-  // Withdrawal form state
-  const [accountName, setAccountName] = useState("");
-  const [accountNumber, setAccountNumber] = useState("");
-  const [bankName, setBankName] = useState("");
-  
-  // Upgrade state
-  const [selectedUpgrade, setSelectedUpgrade] = useState<number | null>(null);
+  const [accountUpgraded, setAccountUpgraded] = useState(false);
+  const [taxJoinCompletedAt, setTaxJoinCompletedAt] = useState<string | null>(null);
 
   useEffect(() => {
     fetchUserReferralData();
@@ -68,7 +36,7 @@ const EarnMore = () => {
 
       const { data, error } = await supabase
         .from('profiles')
-        .select('referral_code, referral_count, referral_earnings, referral_rate')
+        .select('referral_code, referral_count, referral_earnings, referral_rate, account_upgraded, tax_join_completed_at')
         .eq('id', user.id)
         .single();
 
@@ -79,6 +47,8 @@ const EarnMore = () => {
         setReferralCount(data.referral_count);
         setReferralEarnings(Number(data.referral_earnings) || 0);
         setReferralRate(Number(data.referral_rate) || 15000);
+        setAccountUpgraded(data.account_upgraded || false);
+        setTaxJoinCompletedAt(data.tax_join_completed_at);
       }
     } catch (error) {
       toast({
@@ -138,113 +108,75 @@ const EarnMore = () => {
     }
   };
 
-  const handleWithdraw = async () => {
-    setSubmitting(true);
-    try {
-      // Validate inputs
-      const validated = withdrawalSchema.parse({
-        amount: referralEarnings,
-        accountName: accountName.trim(),
-        accountNumber: accountNumber.trim(),
-        bankName: bankName.trim()
-      });
-
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error("Not authenticated");
-
-      const { error } = await supabase
-        .from('withdrawal_requests')
-        .insert({
-          user_id: user.id,
-          amount: validated.amount,
-          account_name: validated.accountName,
-          account_number: validated.accountNumber,
-          bank_name: validated.bankName,
-        });
-
-      if (error) throw error;
-
+  const handleWithdraw = () => {
+    if (!accountUpgraded) {
       toast({
-        title: "Withdrawal Request Submitted",
-        description: "Your request is being processed",
-      });
-
-      setShowWithdrawModal(false);
-      setAccountName("");
-      setAccountNumber("");
-      setBankName("");
-    } catch (error) {
-      if (error instanceof z.ZodError) {
-        toast({
-          title: "Validation Error",
-          description: error.errors[0].message,
-          variant: "destructive",
-        });
-      } else {
-        toast({
-          title: "Error",
-          description: "Failed to submit withdrawal request",
-          variant: "destructive",
-        });
-      }
-    } finally {
-      setSubmitting(false);
-    }
-  };
-
-  const handleUpgrade = async () => {
-    if (!selectedUpgrade) return;
-
-    // Validate upgrade amount is valid
-    if (![25000, 30000].includes(selectedUpgrade)) {
-      toast({
-        title: "Invalid Upgrade",
-        description: "Please select a valid upgrade tier",
         variant: "destructive",
+        description: "Please upgrade your account first to access withdrawals",
+      });
+      navigate('/account-upgrade');
+      return;
+    }
+
+    if (referralEarnings < 120000) {
+      toast({
+        variant: "destructive",
+        description: "Minimum withdrawal amount is ₦120,000",
       });
       return;
     }
 
-    setSubmitting(true);
+    if (referralEarnings > 400000) {
+      toast({
+        variant: "destructive",
+        description: "Maximum withdrawal per request is ₦400,000. Please contact support.",
+      });
+      return;
+    }
+
+    navigate('/withdrawal/form');
+  };
+
+  const handleTaxJoinGroup = async () => {
+    const whatsappLink = "https://chat.whatsapp.com/JNuHAVaGNgQD40cQXOwFwV";
+    const telegramLink = "https://t.me/+wYh9iSrC3YkyMTlk";
+    
+    window.open(whatsappLink, '_blank');
+    window.open(telegramLink, '_blank');
+
     try {
       const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error("Not authenticated");
+      if (!user) return;
 
+      const newRate = referralRate + 10000;
+      
       const { error } = await supabase
-        .from('referral_upgrades')
-        .insert({
-          user_id: user.id,
-          previous_rate: referralRate,
-          new_rate: selectedUpgrade,
-          payment_amount: selectedUpgrade,
-          payment_status: 'pending',
-        });
+        .from('profiles')
+        .update({
+          referral_rate: newRate,
+          tax_join_completed_at: new Date().toISOString()
+        })
+        .eq('id', user.id);
 
       if (error) throw error;
 
       toast({
-        title: "Upgrade Request Submitted",
-        description: "Complete payment to activate your upgrade",
+        description: "🎉 Bonus activated! Your referral rate increased by ₦10,000 for 24 hours!",
       });
 
-      setShowUpgradeModal(false);
-      setSelectedUpgrade(null);
+      fetchUserReferralData();
     } catch (error) {
       toast({
-        title: "Error",
-        description: "Failed to submit upgrade request",
         variant: "destructive",
+        description: "Failed to activate bonus. Please try again.",
       });
-    } finally {
-      setSubmitting(false);
     }
   };
 
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('en-NG', {
-      style: 'currency',
-      currency: 'NGN',
       minimumFractionDigits: 0,
+      maximumFractionDigits: 0,
     }).format(amount);
   };
 
@@ -283,12 +215,12 @@ const EarnMore = () => {
           </Card>
           <Card className="p-4 text-center">
             <Wallet className="h-6 w-6 mx-auto mb-2 text-green-600" />
-            <p className="text-2xl font-bold text-foreground">{formatCurrency(referralEarnings)}</p>
+            <p className="text-2xl font-bold text-foreground">₦{formatCurrency(referralEarnings)}</p>
             <p className="text-xs text-muted-foreground">Earnings</p>
           </Card>
           <Card className="p-4 text-center">
             <TrendingUp className="h-6 w-6 mx-auto mb-2 text-blue-600" />
-            <p className="text-2xl font-bold text-foreground">{formatCurrency(referralRate)}</p>
+            <p className="text-2xl font-bold text-foreground">₦{formatCurrency(referralRate)}</p>
             <p className="text-xs text-muted-foreground">Per Referral</p>
           </Card>
         </div>
@@ -301,7 +233,7 @@ const EarnMore = () => {
             </div>
             <div>
               <h3 className="text-lg font-semibold">Referral Program</h3>
-              <p className="text-sm text-muted-foreground">Share and earn {formatCurrency(referralRate)}/referral</p>
+              <p className="text-sm text-muted-foreground">Share and earn ₦{formatCurrency(referralRate)}/referral</p>
             </div>
           </div>
           
@@ -351,9 +283,9 @@ const EarnMore = () => {
                   <h5 className="font-semibold text-sm">How it works:</h5>
                   <ul className="text-sm text-muted-foreground mt-1 space-y-1">
                     <li>• Share your referral code or link with friends</li>
-                    <li>• When they register, you earn {formatCurrency(referralRate)}</li>
+                    <li>• When they register, you earn ₦{formatCurrency(referralRate)}</li>
                     <li>• Track your earnings in real-time</li>
-                    <li>• Withdraw when you reach ₦170,000</li>
+                    <li>• Withdraw when you reach ₦120,000</li>
                   </ul>
                 </div>
               </div>
@@ -361,194 +293,131 @@ const EarnMore = () => {
           </div>
         </Card>
 
-        {/* Withdrawal Section */}
-        <Card className="p-5">
-          <div className="flex items-center justify-between mb-4">
-            <div>
-              <h3 className="text-lg font-semibold">Withdraw Earnings</h3>
-              <p className="text-sm text-muted-foreground">
-                {referralEarnings >= 170000 
-                  ? "You can withdraw your earnings now!" 
-                  : `Earn ${formatCurrency(170000 - referralEarnings)} more to withdraw`}
-              </p>
-            </div>
-            <Wallet className="h-8 w-8 text-green-600" />
-          </div>
-          
-          <Button 
-            className="w-full"
-            size="lg"
-            disabled={referralEarnings < 170000}
-            onClick={() => setShowWithdrawModal(true)}
-          >
-            Withdraw {formatCurrency(referralEarnings)}
-          </Button>
+        {/* Account Status & Actions */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <DollarSign className="w-5 h-5" />
+              Account Actions
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {!accountUpgraded && (
+              <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
+                <p className="text-sm text-amber-800 font-medium mb-2">
+                  🔒 Account Not Upgraded
+                </p>
+                <p className="text-sm text-amber-700 mb-3">
+                  Upgrade your account for ₦15,000 to unlock withdrawal features
+                </p>
+                <Button 
+                  onClick={() => navigate('/account-upgrade')}
+                  className="w-full"
+                  variant="default"
+                >
+                  Upgrade Account Now
+                </Button>
+              </div>
+            )}
+
+            {accountUpgraded && (
+              <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+                <p className="text-sm text-green-800 font-medium mb-2">
+                  ✅ Account Upgraded
+                </p>
+                <p className="text-2xl font-bold text-green-700 mb-3">
+                  ₦{formatCurrency(referralEarnings)}
+                </p>
+                <Button 
+                  onClick={handleWithdraw}
+                  className="w-full"
+                  size="lg"
+                  disabled={referralEarnings < 120000 || referralEarnings > 400000}
+                >
+                  <Wallet className="w-4 h-4 mr-2" />
+                  Request Withdrawal
+                </Button>
+                {referralEarnings < 120000 && (
+                  <p className="text-xs text-muted-foreground mt-2 text-center">
+                    Minimum: ₦120,000 • Need ₦{formatCurrency(120000 - referralEarnings)} more
+                  </p>
+                )}
+                {referralEarnings > 400000 && (
+                  <p className="text-xs text-amber-600 mt-2 text-center">
+                    Maximum per withdrawal: ₦400,000 • Please contact support
+                  </p>
+                )}
+              </div>
+            )}
+
+            {/* Tax/Join Group Button */}
+            {!taxJoinCompletedAt && (
+              <div className="bg-primary/10 border border-primary/20 rounded-lg p-4">
+                <p className="text-sm font-medium mb-2">
+                  🎁 Boost Your Earnings!
+                </p>
+                <p className="text-sm text-muted-foreground mb-3">
+                  Join our community groups and get +₦10,000 bonus for 24 hours
+                </p>
+                <Button 
+                  onClick={handleTaxJoinGroup}
+                  className="w-full"
+                  variant="default"
+                >
+                  Perform Tax / Join Group
+                </Button>
+              </div>
+            )}
+
+            {taxJoinCompletedAt && (
+              <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+                <p className="text-sm text-green-800 font-medium">
+                  ✨ Bonus Active! +₦10,000 for 24hrs
+                </p>
+              </div>
+            )}
+          </CardContent>
         </Card>
 
-        {/* Upgrade Section */}
-        <Card className="p-5">
-          <div className="flex items-center justify-between mb-4">
-            <div>
-              <h3 className="text-lg font-semibold">Upgrade Referral Earnings</h3>
-              <p className="text-sm text-muted-foreground">Increase your earnings per referral</p>
-            </div>
-            <ArrowUpCircle className="h-8 w-8 text-blue-600" />
-          </div>
-
-          <div className="space-y-3">
+        {/* Upgrade Referral Rate Section */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <ArrowUpCircle className="w-5 h-5" />
+              Upgrade Referral Earnings
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-3">
             {[
               { rate: 15000, label: "Default", current: referralRate === 15000 },
-              { rate: 25000, label: "Premium", current: referralRate === 25000, disabled: referralRate < 15000 },
-              { rate: 30000, label: "Elite", current: referralRate === 30000, disabled: referralRate < 25000 },
+              { rate: 25000, label: "Premium", current: referralRate === 25000 },
+              { rate: 30000, label: "Elite", current: referralRate === 30000 },
             ].map((tier) => (
               <div
                 key={tier.rate}
                 className={`p-4 border rounded-lg ${
                   tier.current ? 'border-primary bg-primary/5' : 'border-border'
-                } ${tier.disabled ? 'opacity-50' : ''}`}
+                }`}
               >
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="font-semibold">{tier.label} - {formatCurrency(tier.rate)}/referral</p>
+                    <p className="font-semibold">{tier.label} - ₦{formatCurrency(tier.rate)}/referral</p>
                     <p className="text-sm text-muted-foreground">
-                      {tier.current ? 'Current Rate' : `Upgrade for ${formatCurrency(tier.rate)}`}
+                      {tier.current ? 'Current Rate' : `Upgrade for ₦${formatCurrency(tier.rate)}`}
                     </p>
                   </div>
-                  {!tier.current && !tier.disabled && (
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => {
-                        setSelectedUpgrade(tier.rate);
-                        setShowUpgradeModal(true);
-                      }}
-                    >
-                      Upgrade
-                    </Button>
-                  )}
                   {tier.current && (
                     <CheckCircle className="h-5 w-5 text-primary" />
                   )}
                 </div>
               </div>
             ))}
-          </div>
+            <p className="text-xs text-muted-foreground text-center pt-2">
+              Contact support to upgrade your referral rate
+            </p>
+          </CardContent>
         </Card>
       </div>
-
-      {/* Withdrawal Modal */}
-      <Dialog open={showWithdrawModal} onOpenChange={setShowWithdrawModal}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Withdraw Earnings</DialogTitle>
-            <DialogDescription>
-              Enter your bank details to withdraw {formatCurrency(referralEarnings)}
-            </DialogDescription>
-          </DialogHeader>
-
-          <div className="space-y-4">
-            <div>
-              <Label htmlFor="accountName">Account Name</Label>
-              <Input
-                id="accountName"
-                placeholder="John Doe"
-                value={accountName}
-                onChange={(e) => setAccountName(e.target.value)}
-              />
-            </div>
-
-            <div>
-              <Label htmlFor="accountNumber">Account Number</Label>
-              <Input
-                id="accountNumber"
-                placeholder="0123456789"
-                value={accountNumber}
-                onChange={(e) => setAccountNumber(e.target.value)}
-              />
-            </div>
-
-            <div>
-              <Label htmlFor="bankName">Bank Name</Label>
-              <Input
-                id="bankName"
-                placeholder="Bank Name"
-                value={bankName}
-                onChange={(e) => setBankName(e.target.value)}
-              />
-            </div>
-
-            <Button 
-              className="w-full" 
-              onClick={handleWithdraw}
-              disabled={submitting}
-            >
-              {submitting ? (
-                <>
-                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                  Processing...
-                </>
-              ) : (
-                `Withdraw ${formatCurrency(referralEarnings)}`
-              )}
-            </Button>
-          </div>
-        </DialogContent>
-      </Dialog>
-
-      {/* Upgrade Modal */}
-      <Dialog open={showUpgradeModal} onOpenChange={setShowUpgradeModal}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Upgrade Referral Rate</DialogTitle>
-            <DialogDescription>
-              Upgrade to earn {selectedUpgrade ? formatCurrency(selectedUpgrade) : ''} per referral
-            </DialogDescription>
-          </DialogHeader>
-
-          <div className="space-y-4">
-            <div className="bg-accent p-4 rounded-lg">
-              <div className="flex justify-between mb-2">
-                <span className="text-sm">Current Rate:</span>
-                <span className="font-semibold">{formatCurrency(referralRate)}</span>
-              </div>
-              <div className="flex justify-between mb-2">
-                <span className="text-sm">New Rate:</span>
-                <span className="font-semibold text-primary">
-                  {selectedUpgrade ? formatCurrency(selectedUpgrade) : ''}
-                </span>
-              </div>
-              <div className="flex justify-between pt-2 border-t">
-                <span className="font-semibold">Payment Required:</span>
-                <span className="font-bold text-lg">
-                  {selectedUpgrade ? formatCurrency(selectedUpgrade) : ''}
-                </span>
-              </div>
-            </div>
-
-            <div className="bg-blue-50 dark:bg-blue-950/30 p-4 rounded-lg">
-              <p className="text-sm text-muted-foreground">
-                After payment confirmation, your referral rate will be upgraded immediately. 
-                All future referrals will earn at the new rate.
-              </p>
-            </div>
-
-            <Button 
-              className="w-full" 
-              onClick={handleUpgrade}
-              disabled={submitting}
-            >
-              {submitting ? (
-                <>
-                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                  Processing...
-                </>
-              ) : (
-                `Pay ${selectedUpgrade ? formatCurrency(selectedUpgrade) : ''} to Upgrade`
-              )}
-            </Button>
-          </div>
-        </DialogContent>
-      </Dialog>
     </div>
   );
 };

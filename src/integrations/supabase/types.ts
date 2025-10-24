@@ -16,6 +16,7 @@ export type Database = {
     Tables: {
       profiles: {
         Row: {
+          account_upgraded: boolean | null
           created_at: string
           email: string | null
           full_name: string | null
@@ -26,9 +27,11 @@ export type Database = {
           referral_earnings: number
           referral_rate: number
           referred_by: string | null
+          tax_join_completed_at: string | null
           updated_at: string
         }
         Insert: {
+          account_upgraded?: boolean | null
           created_at?: string
           email?: string | null
           full_name?: string | null
@@ -39,9 +42,11 @@ export type Database = {
           referral_earnings?: number
           referral_rate?: number
           referred_by?: string | null
+          tax_join_completed_at?: string | null
           updated_at?: string
         }
         Update: {
+          account_upgraded?: boolean | null
           created_at?: string
           email?: string | null
           full_name?: string | null
@@ -52,6 +57,7 @@ export type Database = {
           referral_earnings?: number
           referral_rate?: number
           referred_by?: string | null
+          tax_join_completed_at?: string | null
           updated_at?: string
         }
         Relationships: [
@@ -137,6 +143,7 @@ export type Database = {
           bank_name: string
           created_at: string
           id: string
+          payment_screenshot: string | null
           status: string | null
           updated_at: string
           user_id: string
@@ -148,6 +155,7 @@ export type Database = {
           bank_name: string
           created_at?: string
           id?: string
+          payment_screenshot?: string | null
           status?: string | null
           updated_at?: string
           user_id: string
@@ -159,6 +167,7 @@ export type Database = {
           bank_name?: string
           created_at?: string
           id?: string
+          payment_screenshot?: string | null
           status?: string | null
           updated_at?: string
           user_id?: string
@@ -190,6 +199,7 @@ export type Database = {
         Args: { new_user_id: string; referrer_code: string }
         Returns: undefined
       }
+      reset_tax_join_bonus: { Args: never; Returns: undefined }
     }
     Enums: {
       app_role: "admin" | "user"

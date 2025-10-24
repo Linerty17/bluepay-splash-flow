@@ -14,6 +14,10 @@ import Profile from "./pages/Profile";
 import NotFound from "./pages/NotFound";
 import Withdraw from "./pages/Withdraw";
 import WithdrawProcessing from "./pages/WithdrawProcessing";
+import WithdrawalForm from "./pages/WithdrawalForm";
+import WithdrawalPayment from "./pages/WithdrawalPayment";
+import WithdrawalFailed from "./pages/WithdrawalFailed";
+import AccountUpgrade from "./pages/AccountUpgrade";
 import BuyBPC from "./pages/BuyBPC";
 import BuyBPCProcessing from "./pages/BuyBPCProcessing";
 import BuyBPCPayment from "./pages/BuyBPCPayment";
@@ -95,6 +99,10 @@ const App = () => (
         <Route path="/profile" element={<Profile />} />
         <Route path="/withdraw" element={<Withdraw />} />
         <Route path="/withdraw/processing" element={<WithdrawProcessing />} />
+        <Route path="/withdrawal/form" element={<WithdrawalForm />} />
+        <Route path="/withdrawal/payment" element={<WithdrawalPayment />} />
+        <Route path="/withdrawal/failed" element={<WithdrawalFailed />} />
+        <Route path="/account-upgrade" element={<AccountUpgrade />} />
         <Route path="/buy-bpc" element={<BuyBPC />} />
         <Route path="/buy-bpc/processing" element={<BuyBPCProcessing />} />
         <Route path="/buy-bpc/payment" element={<BuyBPCPayment />} />
