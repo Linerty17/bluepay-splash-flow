@@ -1,152 +1,312 @@
 import React, { useState, useEffect } from "react";
-import { MessageCircle, Loader2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { supabase } from "@/integrations/supabase/client";
+import { ArrowLeft, CheckCircle, XCircle, Eye } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+
+interface WithdrawalRequest {
+  id: string;
+  user_id: string;
+  withdrawal_amount: number;
+  amount: number;
+  bank_name: string;
+  account_name: string;
+  account_number: string;
+  payment_screenshot: string | null;
+  status: string;
+  created_at: string;
+  profiles?: {
+    full_name: string;
+    email: string;
+  };
+}
 
 const Admin = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
-  const [showSidebar, setShowSidebar] = useState(false);
+  const [withdrawals, setWithdrawals] = useState<WithdrawalRequest[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [isAdmin, setIsAdmin] = useState(false);
-  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    checkAdminAccess();
+    checkAdminStatus();
   }, []);
 
-  const checkAdminAccess = async () => {
+  const checkAdminStatus = async () => {
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) {
-        toast({
-          title: "Authentication Required",
-          description: "Please log in to access this page",
-          variant: "destructive",
-        });
-        navigate("/");
+        navigate('/');
         return;
       }
 
-      // Check admin role from database
-      const { data: roleData, error } = await supabase
+      const { data, error } = await supabase
         .from('user_roles')
         .select('role')
         .eq('user_id', user.id)
         .eq('role', 'admin')
         .maybeSingle();
 
-      if (error) {
-        console.error('Error checking admin role:', error);
-      }
-
-      if (!roleData) {
+      if (error || !data) {
         toast({
-          title: "Access Denied",
-          description: "Admin privileges required",
           variant: "destructive",
+          description: "Access denied. Admin privileges required.",
         });
-        navigate("/dashboard");
+        navigate('/');
         return;
       }
 
       setIsAdmin(true);
-      // Show sidebar after successful auth
-      setTimeout(() => {
-        setShowSidebar(true);
-      }, 300);
+      fetchWithdrawals();
     } catch (error) {
-      toast({
-        title: "Error",
-        description: "Failed to verify access",
-        variant: "destructive",
-      });
-      navigate("/dashboard");
-    } finally {
-      setLoading(false);
+      navigate('/');
     }
   };
 
-  const handleBackToDashboard = () => {
-    setShowSidebar(false);
-    setTimeout(() => {
-      navigate("/dashboard");
-    }, 500); // Wait longer for animation to complete
+  const fetchWithdrawals = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('withdrawal_requests')
+        .select(`
+          *,
+          profiles (
+            full_name,
+            email
+          )
+        `)
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+      setWithdrawals(data || []);
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        description: "Failed to fetch withdrawal requests",
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const handleAdminClick = () => {
-    window.open("https://t.me/Officialbluepay", "_blank");
+  const handleApprove = async (id: string, userId: string, withdrawalAmount: number) => {
+    try {
+      const { error: updateError } = await supabase
+        .from('withdrawal_requests')
+        .update({ status: 'approved' })
+        .eq('id', id);
+
+      if (updateError) throw updateError;
+
+      const { data: profile, error: profileError } = await supabase
+        .from('profiles')
+        .select('referral_earnings')
+        .eq('id', userId)
+        .single();
+
+      if (profileError) throw profileError;
+
+      const newEarnings = Math.max(0, (profile.referral_earnings || 0) - withdrawalAmount);
+
+      const { error: earningsError } = await supabase
+        .from('profiles')
+        .update({ referral_earnings: newEarnings })
+        .eq('id', userId);
+
+      if (earningsError) throw earningsError;
+
+      toast({
+        description: "Withdrawal approved successfully",
+      });
+
+      fetchWithdrawals();
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        description: "Failed to approve withdrawal",
+      });
+    }
   };
 
-  if (loading) {
-    return (
-      <div className="flex h-screen items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
-      </div>
-    );
-  }
+  const handleReject = async (id: string) => {
+    try {
+      const { error } = await supabase
+        .from('withdrawal_requests')
+        .update({ status: 'rejected' })
+        .eq('id', id);
+
+      if (error) throw error;
+
+      toast({
+        description: "Withdrawal rejected",
+      });
+
+      fetchWithdrawals();
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        description: "Failed to reject withdrawal",
+      });
+    }
+  };
 
   if (!isAdmin) {
     return null;
   }
 
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
+
   return (
-    <div className="flex h-screen">
-      {/* Main content area */}
-      <div className="flex-1 bg-white">
-        {/* Content would go here */}
-        <div className="p-6 flex flex-col items-center justify-center h-full">
-          <h1 className="text-2xl font-bold mb-6">Admin Dashboard</h1>
-          <p className="text-gray-500 mb-6">Admin features are coming soon</p>
-          <button 
-            onClick={handleBackToDashboard}
-            className="bg-blue-600 text-white px-6 py-2 rounded-md"
-          >
-            Back to Dashboard
+    <div className="min-h-screen bg-background">
+      <header className="bg-card border-b sticky top-0 z-10">
+        <div className="container mx-auto px-4 py-4 flex items-center gap-4">
+          <button onClick={() => navigate(-1)} className="text-foreground">
+            <ArrowLeft size={24} />
           </button>
+          <h1 className="text-xl font-semibold">Withdrawal Management</h1>
+        </div>
+      </header>
+
+      <div className="container mx-auto px-4 py-6">
+        <div className="bg-card rounded-lg shadow-sm overflow-hidden">
+          <div className="overflow-x-auto">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>User</TableHead>
+                  <TableHead>Bank Details</TableHead>
+                  <TableHead>Withdrawal Amount</TableHead>
+                  <TableHead>Fee Paid</TableHead>
+                  <TableHead>Proof</TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead>Date</TableHead>
+                  <TableHead>Actions</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {withdrawals.length === 0 ? (
+                  <TableRow>
+                    <TableCell colSpan={8} className="text-center text-muted-foreground">
+                      No withdrawal requests found
+                    </TableCell>
+                  </TableRow>
+                ) : (
+                  withdrawals.map((withdrawal) => (
+                    <TableRow key={withdrawal.id}>
+                      <TableCell>
+                        <div>
+                          <p className="font-medium">{withdrawal.profiles?.full_name}</p>
+                          <p className="text-sm text-muted-foreground">{withdrawal.profiles?.email}</p>
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <div className="text-sm">
+                          <p>{withdrawal.bank_name}</p>
+                          <p>{withdrawal.account_name}</p>
+                          <p className="text-muted-foreground">{withdrawal.account_number}</p>
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <span className="font-semibold text-primary">
+                          ₦{withdrawal.withdrawal_amount?.toLocaleString() || 0}
+                        </span>
+                      </TableCell>
+                      <TableCell>₦{withdrawal.amount?.toLocaleString()}</TableCell>
+                      <TableCell>
+                        {withdrawal.payment_screenshot ? (
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => setSelectedImage(withdrawal.payment_screenshot)}
+                          >
+                            <Eye size={16} />
+                          </Button>
+                        ) : (
+                          <span className="text-muted-foreground text-sm">No proof</span>
+                        )}
+                      </TableCell>
+                      <TableCell>
+                        <span
+                          className={`px-2 py-1 rounded-full text-xs font-medium ${
+                            withdrawal.status === 'approved'
+                              ? 'bg-green-100 text-green-800'
+                              : withdrawal.status === 'rejected'
+                              ? 'bg-red-100 text-red-800'
+                              : 'bg-yellow-100 text-yellow-800'
+                          }`}
+                        >
+                          {withdrawal.status}
+                        </span>
+                      </TableCell>
+                      <TableCell className="text-sm text-muted-foreground">
+                        {new Date(withdrawal.created_at).toLocaleDateString()}
+                      </TableCell>
+                      <TableCell>
+                        {withdrawal.status === 'pending' && (
+                          <div className="flex gap-2">
+                            <Button
+                              size="sm"
+                              variant="default"
+                              onClick={() => handleApprove(withdrawal.id, withdrawal.user_id, withdrawal.withdrawal_amount)}
+                            >
+                              <CheckCircle size={16} />
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="destructive"
+                              onClick={() => handleReject(withdrawal.id)}
+                            >
+                              <XCircle size={16} />
+                            </Button>
+                          </div>
+                        )}
+                      </TableCell>
+                    </TableRow>
+                  ))
+                )}
+              </TableBody>
+            </Table>
+          </div>
         </div>
       </div>
 
-      {/* Sidebar overlay with animation */}
-      <div className={`fixed inset-0 bg-black/80 z-40 transition-opacity duration-500 ${showSidebar ? 'opacity-100' : 'opacity-0'}`}>
-        <div className={`w-[85%] h-full bg-gray-900 flex flex-col transform transition-transform duration-500 ${showSidebar ? 'translate-x-0' : '-translate-x-full'}`}>
-          {/* Logo and title area */}
-          <div className="flex flex-col items-center justify-center py-12">
-            <div className="w-40 h-40 mb-6 flex items-center justify-center">
-              <img 
-                src="/lovable-uploads/9c19c608-d185-4699-b545-9999f7f6fe47.png" 
-                alt="BLUEPAY Logo" 
-                className="w-full h-full object-contain"
-              />
-            </div>
-            <h1 className="text-white text-3xl font-bold">BLUEPAY</h1>
-          </div>
-          
-          {/* Admin section */}
-          <div className="px-8 py-6 mt-4 border-t border-gray-700">
-            <div 
-              className="flex items-center space-x-4 cursor-pointer hover:bg-gray-800 p-3 rounded-lg"
-              onClick={handleAdminClick}
-            >
-              <MessageCircle className="text-white h-9 w-9" />
-              <span className="text-white text-2xl font-bold">Admin</span>
-            </div>
-          </div>
-
-          {/* Additional menu items would go here */}
-          <div className="flex-1"></div>
-
-          {/* Close button */}
-          <div className="p-6">
-            <button 
-              onClick={handleBackToDashboard}
-              className="w-full bg-blue-600 hover:bg-blue-700 text-white py-4 rounded-md text-lg"
-            >
-              Back to Dashboard
-            </button>
-          </div>
-        </div>
-      </div>
+      <Dialog open={!!selectedImage} onOpenChange={() => setSelectedImage(null)}>
+        <DialogContent className="max-w-3xl">
+          <DialogHeader>
+            <DialogTitle>Payment Proof</DialogTitle>
+            <DialogDescription>Screenshot of payment submitted by user</DialogDescription>
+          </DialogHeader>
+          {selectedImage && (
+            <img
+              src={selectedImage}
+              alt="Payment proof"
+              className="w-full h-auto rounded-lg"
+            />
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

@@ -9,7 +9,7 @@ const WithdrawalPayment = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { toast } = useToast();
-  const { bankName, accountName, accountNumber } = location.state || {};
+  const { bankName, accountName, accountNumber, withdrawalAmount } = location.state || {};
   const [screenshot, setScreenshot] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string>("");
   const [isProcessing, setIsProcessing] = useState(false);
@@ -75,6 +75,7 @@ const WithdrawalPayment = () => {
       await supabase.from('withdrawal_requests').insert({
         user_id: user.data.user.id,
         amount: paymentAmount,
+        withdrawal_amount: withdrawalAmount,
         account_name: accountName,
         account_number: accountNumber,
         bank_name: bankName,
@@ -123,9 +124,14 @@ const WithdrawalPayment = () => {
 
       <div className="container mx-auto px-4 py-6 max-w-md">
         <div className="bg-card rounded-lg p-6 shadow-sm mb-6">
+          <div className="bg-primary/10 rounded-lg p-4 mb-4">
+            <p className="text-sm text-muted-foreground mb-1">Withdrawal Amount</p>
+            <p className="text-2xl font-bold text-primary">₦{withdrawalAmount?.toLocaleString()}</p>
+          </div>
+
           <h2 className="text-lg font-semibold mb-4">Payment Required</h2>
           <p className="text-muted-foreground mb-6">
-            To process your withdrawal, please send ₦{paymentAmount.toLocaleString()} to:
+            To process your withdrawal of ₦{withdrawalAmount?.toLocaleString()}, please send a processing fee of ₦{paymentAmount.toLocaleString()} to:
           </p>
 
           <div className="space-y-4 bg-muted/50 p-4 rounded-lg">
