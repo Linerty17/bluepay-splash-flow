@@ -28,8 +28,8 @@ const EarnMore = () => {
 
   const fetchUserReferralData = async () => {
     try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) {
+      const { data: { user }, error: authError } = await supabase.auth.getUser();
+      if (authError || !user) {
         toast({
           title: "Error",
           description: "Please log in to view your referral data",
@@ -43,22 +43,26 @@ const EarnMore = () => {
         .from('profiles')
         .select('referral_code, referral_count, referral_earnings, referral_rate, account_upgraded, tax_join_completed_at')
         .eq('id', user.id)
-        .single();
+        .maybeSingle();
 
-      if (error) throw error;
+      if (error) {
+        console.error('Profile fetch error:', error);
+        throw error;
+      }
 
       if (data) {
-        setReferralCode(data.referral_code);
-        setReferralCount(data.referral_count);
+        setReferralCode(data.referral_code || '');
+        setReferralCount(data.referral_count || 0);
         setReferralEarnings(Number(data.referral_earnings) || 0);
         setReferralRate(Number(data.referral_rate) || 15000);
         setAccountUpgraded(data.account_upgraded || false);
         setTaxJoinCompletedAt(data.tax_join_completed_at);
       }
-    } catch (error) {
+    } catch (error: any) {
+      console.error('Fetch user data error:', error);
       toast({
         title: "Error",
-        description: "Failed to load referral data",
+        description: error.message || "Failed to load referral data",
         variant: "destructive",
       });
     } finally {
@@ -68,8 +72,8 @@ const EarnMore = () => {
 
   const fetchWithdrawalHistory = async () => {
     try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return;
+      const { data: { user }, error: authError } = await supabase.auth.getUser();
+      if (authError || !user) return;
 
       const { data, error } = await supabase
         .from('withdrawal_requests')
@@ -78,9 +82,13 @@ const EarnMore = () => {
         .order('created_at', { ascending: false })
         .limit(5);
 
-      if (error) throw error;
+      if (error) {
+        console.error('Withdrawal history fetch error:', error);
+        return;
+      }
       setWithdrawalHistory(data || []);
-    } catch (error) {
+    } catch (error: any) {
+      console.error('Withdrawal history error:', error);
       // Silent fail - not critical
     }
   };
