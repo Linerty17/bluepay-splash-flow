@@ -211,7 +211,7 @@ const EarnMore = () => {
 
   const getStatusBadge = (status: string) => {
     const statusConfig: Record<string, { label: string; variant: "default" | "secondary" | "destructive" | "outline" }> = {
-      'awaiting_activation_payment': { label: 'Payment Pending', variant: 'secondary' },
+      'awaiting_activation_payment': { label: 'Awaiting Payment', variant: 'secondary' },
       'under_review': { label: 'Under Review', variant: 'default' },
       'approved': { label: 'Approved', variant: 'default' },
       'paid': { label: 'Paid', variant: 'default' },
@@ -220,17 +220,6 @@ const EarnMore = () => {
     
     const config = statusConfig[status] || { label: status, variant: 'outline' };
     return <Badge variant={config.variant}>{config.label}</Badge>;
-  };
-
-  const getStatusMessage = (status: string, notes?: string) => {
-    const messages: Record<string, string> = {
-      'awaiting_activation_payment': 'Please pay the activation fee and upload your receipt.',
-      'under_review': 'Payment uploaded. We\'ll review shortly.',
-      'approved': 'Withdrawal approved. Payout queued.',
-      'paid': 'Withdrawal completed.',
-      'rejected': notes ? `Withdrawal rejected: ${notes}` : 'Withdrawal rejected.',
-    };
-    return messages[status] || '';
   };
 
   if (loading) {
@@ -425,14 +414,26 @@ const EarnMore = () => {
                                 year: 'numeric'
                               })}
                             </p>
-                            {withdrawal.status === 'under_review' && (
-                              <p className="text-xs text-blue-600 mt-1">
-                                We're reviewing your activation payment.
+                            {withdrawal.status === 'awaiting_activation_payment' && (
+                              <p className="text-xs text-amber-600 mt-1">
+                                Please pay the activation fee and upload your receipt.
                               </p>
                             )}
-                            {withdrawal.status === 'rejected' && withdrawal.notes && (
+                            {withdrawal.status === 'under_review' && (
+                              <p className="text-xs text-blue-600 mt-1">
+                                Payment uploaded. We'll review shortly.
+                              </p>
+                            )}
+                            {(withdrawal.status === 'approved' || withdrawal.status === 'paid') && (
+                              <p className="text-xs text-green-600 mt-1">
+                                {withdrawal.status === 'approved' ? 'Withdrawal approved. Payout queued.' : 'Withdrawal completed.'}
+                              </p>
+                            )}
+                            {withdrawal.status === 'rejected' && (
                               <div className="mt-1">
-                                <p className="text-xs text-destructive">{withdrawal.notes}</p>
+                                <p className="text-xs text-destructive">
+                                  Withdrawal rejected: {withdrawal.notes || 'No reason provided'}. Contact support on Telegram.
+                                </p>
                                 <Button
                                   variant="link"
                                   size="sm"
