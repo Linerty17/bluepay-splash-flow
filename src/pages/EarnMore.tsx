@@ -5,6 +5,8 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { WithdrawModal } from "@/components/WithdrawModal";
+import { Badge } from "@/components/ui/badge";
 
 const EarnMore = () => {
   const navigate = useNavigate();
@@ -16,9 +18,12 @@ const EarnMore = () => {
   const [referralRate, setReferralRate] = useState<number>(15000);
   const [accountUpgraded, setAccountUpgraded] = useState(false);
   const [taxJoinCompletedAt, setTaxJoinCompletedAt] = useState<string | null>(null);
+  const [withdrawModalOpen, setWithdrawModalOpen] = useState(false);
+  const [withdrawalHistory, setWithdrawalHistory] = useState<any[]>([]);
 
   useEffect(() => {
     fetchUserReferralData();
+    fetchWithdrawalHistory();
   }, []);
 
   const fetchUserReferralData = async () => {
@@ -58,6 +63,25 @@ const EarnMore = () => {
       });
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchWithdrawalHistory = async () => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      const { data, error } = await supabase
+        .from('withdrawal_requests')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false })
+        .limit(5);
+
+      if (error) throw error;
+      setWithdrawalHistory(data || []);
+    } catch (error) {
+      // Silent fail - not critical
     }
   };
 
@@ -118,23 +142,20 @@ const EarnMore = () => {
       return;
     }
 
-    if (referralEarnings < 120000) {
+    if (referralEarnings < 100000) {
       toast({
         variant: "destructive",
-        description: "Minimum withdrawal amount is ₦120,000",
+        description: "Minimum withdrawal amount is ₦100,000",
       });
       return;
     }
 
-    if (referralEarnings > 400000) {
-      toast({
-        variant: "destructive",
-        description: "Maximum withdrawal per request is ₦400,000. Please contact support.",
-      });
-      return;
-    }
+    setWithdrawModalOpen(true);
+  };
 
-    navigate('/withdrawal/form');
+  const handleWithdrawSuccess = () => {
+    fetchUserReferralData();
+    fetchWithdrawalHistory();
   };
 
   const handleTaxJoinGroup = async () => {
@@ -178,6 +199,30 @@ const EarnMore = () => {
       minimumFractionDigits: 0,
       maximumFractionDigits: 0,
     }).format(amount);
+  };
+
+  const getStatusBadge = (status: string) => {
+    const statusConfig: Record<string, { label: string; variant: "default" | "secondary" | "destructive" | "outline" }> = {
+      'awaiting_activation_payment': { label: 'Payment Pending', variant: 'secondary' },
+      'under_review': { label: 'Under Review', variant: 'default' },
+      'approved': { label: 'Approved', variant: 'default' },
+      'paid': { label: 'Paid', variant: 'default' },
+      'rejected': { label: 'Rejected', variant: 'destructive' },
+    };
+    
+    const config = statusConfig[status] || { label: status, variant: 'outline' };
+    return <Badge variant={config.variant}>{config.label}</Badge>;
+  };
+
+  const getStatusMessage = (status: string, notes?: string) => {
+    const messages: Record<string, string> = {
+      'awaiting_activation_payment': 'Please pay the activation fee and upload your receipt.',
+      'under_review': 'Payment uploaded. We\'ll review shortly.',
+      'approved': 'Withdrawal approved. Payout queued.',
+      'paid': 'Withdrawal completed.',
+      'rejected': notes ? `Withdrawal rejected: ${notes}` : 'Withdrawal rejected.',
+    };
+    return messages[status] || '';
   };
 
   if (loading) {
@@ -293,21 +338,21 @@ const EarnMore = () => {
           </div>
         </Card>
 
-        {/* Account Status & Actions */}
+        {/* Withdraw Funds Section */}
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <DollarSign className="w-5 h-5" />
-              Account Actions
+              <Wallet className="w-5 h-5" />
+              Withdraw Funds
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             {!accountUpgraded && (
-              <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
-                <p className="text-sm text-amber-800 font-medium mb-2">
+              <div className="bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 rounded-lg p-4">
+                <p className="text-sm font-medium mb-2">
                   🔒 Account Not Upgraded
                 </p>
-                <p className="text-sm text-amber-700 mb-3">
+                <p className="text-sm text-muted-foreground mb-3">
                   Upgrade your account for ₦15,000 to unlock withdrawal features
                 </p>
                 <Button 
@@ -321,33 +366,82 @@ const EarnMore = () => {
             )}
 
             {accountUpgraded && (
-              <div className="bg-green-50 border border-green-200 rounded-lg p-4">
-                <p className="text-sm text-green-800 font-medium mb-2">
-                  ✅ Account Upgraded
-                </p>
-                <p className="text-2xl font-bold text-green-700 mb-3">
-                  ₦{formatCurrency(referralEarnings)}
-                </p>
+              <>
+                <div className="space-y-2 text-sm">
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Available balance:</span>
+                    <span className="font-semibold">₦{formatCurrency(referralEarnings)}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Minimum withdrawal:</span>
+                    <span className="font-medium">₦100,000</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Activation fee:</span>
+                    <span className="font-medium">₦13,400</span>
+                  </div>
+                </div>
+
                 <Button 
                   onClick={handleWithdraw}
                   className="w-full"
                   size="lg"
-                  disabled={referralEarnings < 120000 || referralEarnings > 400000}
+                  disabled={referralEarnings < 100000}
                 >
                   <Wallet className="w-4 h-4 mr-2" />
-                  Request Withdrawal
+                  Withdraw
                 </Button>
-                {referralEarnings < 120000 && (
-                  <p className="text-xs text-muted-foreground mt-2 text-center">
-                    Minimum: ₦120,000 • Need ₦{formatCurrency(120000 - referralEarnings)} more
+
+                {referralEarnings < 100000 && (
+                  <p className="text-xs text-muted-foreground text-center">
+                    Need ₦{formatCurrency(100000 - referralEarnings)} more to withdraw
                   </p>
                 )}
-                {referralEarnings > 400000 && (
-                  <p className="text-xs text-amber-600 mt-2 text-center">
-                    Maximum per withdrawal: ₦400,000 • Please contact support
-                  </p>
+
+                {/* Withdrawal History */}
+                {withdrawalHistory.length > 0 && (
+                  <div className="mt-6 pt-6 border-t">
+                    <h4 className="font-semibold text-sm mb-3">Recent Withdrawals (5)</h4>
+                    <div className="space-y-2">
+                      {withdrawalHistory.map((withdrawal) => (
+                        <div key={withdrawal.id} className="flex items-center justify-between p-3 bg-accent rounded-lg">
+                          <div className="flex-1">
+                            <div className="flex items-center gap-2 mb-1">
+                              <span className="text-sm font-medium">₦{formatCurrency(withdrawal.amount)}</span>
+                              {getStatusBadge(withdrawal.status)}
+                            </div>
+                            <p className="text-xs text-muted-foreground">
+                              {new Date(withdrawal.created_at).toLocaleDateString('en-NG', { 
+                                month: 'short', 
+                                day: 'numeric',
+                                year: 'numeric'
+                              })}
+                            </p>
+                            {withdrawal.status === 'under_review' && (
+                              <p className="text-xs text-blue-600 mt-1">
+                                We're reviewing your activation payment.
+                              </p>
+                            )}
+                            {withdrawal.status === 'rejected' && withdrawal.notes && (
+                              <div className="mt-1">
+                                <p className="text-xs text-destructive">{withdrawal.notes}</p>
+                                <Button
+                                  variant="link"
+                                  size="sm"
+                                  className="h-auto p-0 text-xs"
+                                  onClick={() => window.open('https://t.me/+wYh9iSrC3YkyMTlk', '_blank')}
+                                >
+                                  Contact Support
+                                </Button>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
                 )}
-              </div>
+              </>
             )}
 
             {/* Tax/Join Group Button */}
@@ -418,6 +512,14 @@ const EarnMore = () => {
           </CardContent>
         </Card>
       </div>
+
+      {/* Withdraw Modal */}
+      <WithdrawModal
+        open={withdrawModalOpen}
+        onClose={() => setWithdrawModalOpen(false)}
+        availableBalance={referralEarnings}
+        onSuccess={handleWithdrawSuccess}
+      />
     </div>
   );
 };

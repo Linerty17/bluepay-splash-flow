@@ -139,10 +139,12 @@ export type Database = {
         Row: {
           account_name: string
           account_number: string
+          activation_fee: number | null
           amount: number
           bank_name: string
           created_at: string
           id: string
+          notes: string | null
           payment_screenshot: string | null
           status: string | null
           updated_at: string
@@ -152,10 +154,12 @@ export type Database = {
         Insert: {
           account_name: string
           account_number: string
+          activation_fee?: number | null
           amount: number
           bank_name: string
           created_at?: string
           id?: string
+          notes?: string | null
           payment_screenshot?: string | null
           status?: string | null
           updated_at?: string
@@ -165,10 +169,12 @@ export type Database = {
         Update: {
           account_name?: string
           account_number?: string
+          activation_fee?: number | null
           amount?: number
           bank_name?: string
           created_at?: string
           id?: string
+          notes?: string | null
           payment_screenshot?: string | null
           status?: string | null
           updated_at?: string
