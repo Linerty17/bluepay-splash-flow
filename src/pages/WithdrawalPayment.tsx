@@ -72,7 +72,7 @@ const WithdrawalPayment = () => {
         .from('withdrawal-proofs')
         .getPublicUrl(fileName);
 
-      await supabase.from('withdrawal_requests').insert({
+      const { error: insertError } = await supabase.from('withdrawal_requests').insert({
         user_id: user.data.user.id,
         amount: paymentAmount,
         withdrawal_amount: withdrawalAmount,
@@ -83,10 +83,17 @@ const WithdrawalPayment = () => {
         status: 'pending'
       });
 
-      setTimeout(() => {
-        setIsProcessing(false);
-        navigate("/withdrawal/failed");
-      }, 10000);
+      if (insertError) throw insertError;
+
+      setIsProcessing(false);
+      navigate("/withdraw-processing", {
+        state: {
+          amount: withdrawalAmount,
+          accountName,
+          accountNumber,
+          bank: bankName
+        }
+      });
 
     } catch (error) {
       setIsProcessing(false);

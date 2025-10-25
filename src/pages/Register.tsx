@@ -7,6 +7,14 @@ import { ArrowLeft, Loader2 } from "lucide-react";
 import { useUserStore } from "../stores/userStore";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { z } from "zod";
+
+// Password validation schema
+const passwordSchema = z.string()
+  .min(8, 'Password must be at least 8 characters')
+  .regex(/[A-Z]/, 'Password must contain at least one uppercase letter')
+  .regex(/[a-z]/, 'Password must contain at least one lowercase letter')
+  .regex(/[0-9]/, 'Password must contain at least one number');
 
 const Register = () => {
   const navigate = useNavigate();
@@ -61,6 +69,18 @@ const Register = () => {
     setIsLoading(true);
 
     try {
+      // Validate password strength
+      const passwordValidation = passwordSchema.safeParse(formData.password);
+      if (!passwordValidation.success) {
+        toast({
+          title: "Weak Password",
+          description: passwordValidation.error.errors[0].message,
+          variant: "destructive",
+        });
+        setIsLoading(false);
+        return;
+      }
+
       // Sign up with Supabase Auth
       const { data: authData, error: signUpError } = await supabase.auth.signUp({
         email: formData.email,
@@ -119,10 +139,9 @@ const Register = () => {
       // Navigate to dashboard
       navigate("/dashboard");
     } catch (error: any) {
-      console.error("Registration error:", error);
       toast({
         title: "Registration Failed",
-        description: error.message || "Please try again.",
+        description: "Unable to complete registration. Please try again or contact support.",
         variant: "destructive",
       });
     } finally {
