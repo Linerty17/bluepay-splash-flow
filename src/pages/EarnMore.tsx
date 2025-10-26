@@ -5,7 +5,6 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { WithdrawModal } from "@/components/WithdrawModal";
 import { Badge } from "@/components/ui/badge";
 
 const EarnMore = () => {
@@ -18,7 +17,6 @@ const EarnMore = () => {
   const [referralRate, setReferralRate] = useState<number>(15000);
   const [accountUpgraded, setAccountUpgraded] = useState(false);
   const [taxJoinCompletedAt, setTaxJoinCompletedAt] = useState<string | null>(null);
-  const [withdrawModalOpen, setWithdrawModalOpen] = useState(false);
   const [withdrawalHistory, setWithdrawalHistory] = useState<any[]>([]);
 
   useEffect(() => {
@@ -158,7 +156,7 @@ const EarnMore = () => {
       return;
     }
 
-    setWithdrawModalOpen(true);
+    navigate('/withdrawal/form');
   };
 
   const handleWithdrawSuccess = () => {
@@ -375,7 +373,7 @@ const EarnMore = () => {
                   </div>
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Activation fee:</span>
-                    <span className="font-medium">₦13,400</span>
+                    <span className="font-medium">₦13,450</span>
                   </div>
                 </div>
 
@@ -521,14 +519,6 @@ const EarnMore = () => {
           </CardContent>
         </Card>
       </div>
-
-      {/* Withdraw Modal */}
-      <WithdrawModal
-        open={withdrawModalOpen}
-        onClose={() => setWithdrawModalOpen(false)}
-        availableBalance={referralEarnings}
-        onSuccess={handleWithdrawSuccess}
-      />
     </div>
   );
 };

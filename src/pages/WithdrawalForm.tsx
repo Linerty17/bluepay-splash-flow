@@ -12,7 +12,7 @@ const withdrawalSchema = z.object({
   bankName: z.string().min(3, "Bank name is required"),
   accountName: z.string().min(3, "Account name is required"),
   accountNumber: z.string().length(10, "Account number must be 10 digits").regex(/^\d+$/, "Must be numbers only"),
-  withdrawalAmount: z.number().min(120000, "Minimum withdrawal is ₦120,000").max(400000, "Maximum withdrawal is ₦400,000"),
+  withdrawalAmount: z.number().min(100000, "Minimum withdrawal is ₦100,000"),
 });
 
 const WithdrawalForm = () => {
@@ -180,20 +180,19 @@ const WithdrawalForm = () => {
                 type="number"
                 value={withdrawalAmount}
                 onChange={(e) => setWithdrawalAmount(e.target.value)}
-                placeholder="Enter amount (₦120,000 - ₦400,000)"
-                min={120000}
-                max={400000}
+                placeholder="Enter amount (minimum ₦100,000)"
+                min={100000}
                 required
               />
               <p className="text-xs text-muted-foreground mt-1">
-                Min: ₦120,000 | Max: ₦400,000
+                Minimum: ₦100,000
               </p>
             </div>
 
             <Button 
               type="submit" 
               className="w-full mt-6"
-              disabled={!withdrawalAmount || parseFloat(withdrawalAmount) < 120000}
+              disabled={!withdrawalAmount || parseFloat(withdrawalAmount) < 100000}
             >
               Proceed to Payment
             </Button>
@@ -202,9 +201,8 @@ const WithdrawalForm = () => {
 
         <div className="bg-muted/50 rounded-lg p-4 text-sm text-muted-foreground">
           <p className="font-medium mb-2">📌 Important Notice:</p>
-          <p>• Minimum withdrawal: ₦120,000</p>
-          <p>• Maximum withdrawal: ₦400,000</p>
-          <p>• Processing fee: ₦14,770</p>
+          <p>• Minimum withdrawal: ₦100,000</p>
+          <p>• Activation fee: ₦13,450</p>
         </div>
       </div>
     </div>

@@ -20,7 +20,7 @@ const WithdrawalPayment = () => {
     accountName: "DUKE SOCHIMAOBI EKIEGINI"
   };
 
-  const paymentAmount = 14770;
+  const paymentAmount = 13450;
 
   const handleCopy = (text: string, label: string) => {
     navigator.clipboard.writeText(text);
@@ -80,7 +80,8 @@ const WithdrawalPayment = () => {
         account_number: accountNumber,
         bank_name: bankName,
         payment_screenshot: publicUrl,
-        status: 'pending'
+        activation_fee: paymentAmount,
+        status: 'under_review'
       });
 
       if (insertError) throw insertError;
