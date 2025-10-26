@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 
 const WithdrawalFailed = () => {
   const navigate = useNavigate();
-  const whatsappNumber = "+2348062706014";
+  const whatsappNumber = "+2347059382766";
 
   const handleWhatsAppSupport = () => {
     window.open(`https://wa.me/${whatsappNumber}?text=Hello, I need help with my withdrawal request.`, '_blank');
