@@ -139,15 +139,6 @@ const EarnMore = () => {
   };
 
   const handleWithdraw = () => {
-    if (!accountUpgraded) {
-      toast({
-        variant: "destructive",
-        description: "Please upgrade your account first to access withdrawals",
-      });
-      navigate('/account-upgrade');
-      return;
-    }
-
     if (referralEarnings < 100000) {
       toast({
         variant: "destructive",
@@ -265,6 +256,22 @@ const EarnMore = () => {
           </Card>
         </div>
 
+        {/* Quick Withdraw Button */}
+        <Button 
+          onClick={handleWithdraw}
+          className="w-full"
+          size="lg"
+          disabled={referralEarnings < 100000}
+        >
+          <Wallet className="w-5 h-5 mr-2" />
+          Withdraw Earnings
+        </Button>
+        {referralEarnings < 100000 && (
+          <p className="text-xs text-muted-foreground text-center -mt-4">
+            Need ₦{formatCurrency(100000 - referralEarnings)} more to withdraw (minimum: ₦100,000)
+          </p>
+        )}
+
         {/* Referral Details */}
         <Card className="p-5">
           <div className="flex items-center mb-4">
@@ -325,7 +332,7 @@ const EarnMore = () => {
                     <li>• Share your referral code or link with friends</li>
                     <li>• When they register, you earn ₦{formatCurrency(referralRate)}</li>
                     <li>• Track your earnings in real-time</li>
-                    <li>• Withdraw when you reach ₦120,000</li>
+                    <li>• Withdraw when you reach ₦100,000</li>
                   </ul>
                 </div>
               </div>
@@ -333,126 +340,73 @@ const EarnMore = () => {
           </div>
         </Card>
 
-        {/* Withdraw Funds Section */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Wallet className="w-5 h-5" />
-              Withdraw Funds
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            {!accountUpgraded && (
-              <div className="bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 rounded-lg p-4">
-                <p className="text-sm font-medium mb-2">
-                  🔒 Account Not Upgraded
-                </p>
-                <p className="text-sm text-muted-foreground mb-3">
-                  Upgrade your account for ₦15,000 to unlock withdrawal features
-                </p>
-                <Button 
-                  onClick={() => navigate('/account-upgrade')}
-                  className="w-full"
-                  variant="default"
-                >
-                  Upgrade Account Now
-                </Button>
-              </div>
-            )}
-
-            {accountUpgraded && (
-              <>
-                <div className="space-y-2 text-sm">
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">Available balance:</span>
-                    <span className="font-semibold">₦{formatCurrency(referralEarnings)}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">Minimum withdrawal:</span>
-                    <span className="font-medium">₦100,000</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">Activation fee:</span>
-                    <span className="font-medium">₦13,450</span>
-                  </div>
-                </div>
-
-                <Button 
-                  onClick={handleWithdraw}
-                  className="w-full"
-                  size="lg"
-                  disabled={referralEarnings < 100000}
-                >
-                  <Wallet className="w-4 h-4 mr-2" />
-                  Withdraw
-                </Button>
-
-                {referralEarnings < 100000 && (
-                  <p className="text-xs text-muted-foreground text-center">
-                    Need ₦{formatCurrency(100000 - referralEarnings)} more to withdraw
-                  </p>
-                )}
-
-                {/* Withdrawal History */}
-                {withdrawalHistory.length > 0 && (
-                  <div className="mt-6 pt-6 border-t">
-                    <h4 className="font-semibold text-sm mb-3">Recent Withdrawals (5)</h4>
-                    <div className="space-y-2">
-                      {withdrawalHistory.map((withdrawal) => (
-                        <div key={withdrawal.id} className="flex items-center justify-between p-3 bg-accent rounded-lg">
-                          <div className="flex-1">
-                            <div className="flex items-center gap-2 mb-1">
-                              <span className="text-sm font-medium">₦{formatCurrency(withdrawal.amount)}</span>
-                              {getStatusBadge(withdrawal.status)}
-                            </div>
-                            <p className="text-xs text-muted-foreground">
-                              {new Date(withdrawal.created_at).toLocaleDateString('en-NG', { 
-                                month: 'short', 
-                                day: 'numeric',
-                                year: 'numeric'
-                              })}
-                            </p>
-                            {withdrawal.status === 'awaiting_activation_payment' && (
-                              <p className="text-xs text-amber-600 mt-1">
-                                Please pay the activation fee and upload your receipt.
-                              </p>
-                            )}
-                            {withdrawal.status === 'under_review' && (
-                              <p className="text-xs text-blue-600 mt-1">
-                                Payment uploaded. We'll review shortly.
-                              </p>
-                            )}
-                            {(withdrawal.status === 'approved' || withdrawal.status === 'paid') && (
-                              <p className="text-xs text-green-600 mt-1">
-                                {withdrawal.status === 'approved' ? 'Withdrawal approved. Payout queued.' : 'Withdrawal completed.'}
-                              </p>
-                            )}
-                            {withdrawal.status === 'rejected' && (
-                              <div className="mt-1">
-                                <p className="text-xs text-destructive">
-                                  Withdrawal rejected: {withdrawal.notes || 'No reason provided'}. Contact support on Telegram.
-                                </p>
-                                <Button
-                                  variant="link"
-                                  size="sm"
-                                  className="h-auto p-0 text-xs"
-                                  onClick={() => window.open('https://t.me/+wYh9iSrC3YkyMTlk', '_blank')}
-                                >
-                                  Contact Support
-                                </Button>
-                              </div>
-                            )}
-                          </div>
+        {/* Withdrawal History */}
+        {withdrawalHistory.length > 0 && (
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Wallet className="w-5 h-5" />
+                Recent Withdrawals
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-2">
+                {withdrawalHistory.map((withdrawal) => (
+                  <div key={withdrawal.id} className="flex items-center justify-between p-3 bg-accent rounded-lg">
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2 mb-1">
+                        <span className="text-sm font-medium">₦{formatCurrency(withdrawal.amount)}</span>
+                        {getStatusBadge(withdrawal.status)}
+                      </div>
+                      <p className="text-xs text-muted-foreground">
+                        {new Date(withdrawal.created_at).toLocaleDateString('en-NG', { 
+                          month: 'short', 
+                          day: 'numeric',
+                          year: 'numeric'
+                        })}
+                      </p>
+                      {withdrawal.status === 'awaiting_activation_payment' && (
+                        <p className="text-xs text-amber-600 mt-1">
+                          Please pay the activation fee and upload your receipt.
+                        </p>
+                      )}
+                      {withdrawal.status === 'under_review' && (
+                        <p className="text-xs text-blue-600 mt-1">
+                          Payment uploaded. We'll review shortly.
+                        </p>
+                      )}
+                      {(withdrawal.status === 'approved' || withdrawal.status === 'paid') && (
+                        <p className="text-xs text-green-600 mt-1">
+                          {withdrawal.status === 'approved' ? 'Withdrawal approved. Payout queued.' : 'Withdrawal completed.'}
+                        </p>
+                      )}
+                      {withdrawal.status === 'rejected' && (
+                        <div className="mt-1">
+                          <p className="text-xs text-destructive">
+                            Withdrawal rejected: {withdrawal.notes || 'No reason provided'}. Contact support on Telegram.
+                          </p>
+                          <Button
+                            variant="link"
+                            size="sm"
+                            className="h-auto p-0 text-xs"
+                            onClick={() => window.open('https://t.me/+wYh9iSrC3YkyMTlk', '_blank')}
+                          >
+                            Contact Support
+                          </Button>
                         </div>
-                      ))}
+                      )}
                     </div>
                   </div>
-                )}
-              </>
-            )}
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        )}
 
-            {/* Tax/Join Group Button */}
-            {!taxJoinCompletedAt && (
+        {/* Tax/Join Group Bonus */}
+        {!taxJoinCompletedAt && (
+          <Card>
+            <CardContent className="pt-6">
               <div className="bg-primary/10 border border-primary/20 rounded-lg p-4">
                 <p className="text-sm font-medium mb-2">
                   🎁 Boost Your Earnings!
@@ -468,25 +422,32 @@ const EarnMore = () => {
                   Perform Tax / Join Group
                 </Button>
               </div>
-            )}
+            </CardContent>
+          </Card>
+        )}
 
-            {taxJoinCompletedAt && (
+        {taxJoinCompletedAt && (
+          <Card>
+            <CardContent className="pt-6">
               <div className="bg-green-50 border border-green-200 rounded-lg p-4">
                 <p className="text-sm text-green-800 font-medium">
                   ✨ Bonus Active! +₦10,000 for 24hrs
                 </p>
               </div>
-            )}
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
+        )}
 
         {/* Upgrade Referral Rate Section */}
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <ArrowUpCircle className="w-5 h-5" />
-              Upgrade Referral Earnings
+              Upgrade Referral Rate
             </CardTitle>
+            <p className="text-sm text-muted-foreground mt-1">
+              Increase your earnings per referral by upgrading your rate
+            </p>
           </CardHeader>
           <CardContent className="space-y-3">
             {[
