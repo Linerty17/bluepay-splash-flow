@@ -15,9 +15,9 @@ const WithdrawalPayment = () => {
   const [isProcessing, setIsProcessing] = useState(false);
 
   const bluepayAccount = {
-    bankName: "VFD MFB",
-    accountNumber: "1041966558",
-    accountName: "SUNDAY CHINEMEREM LIBERTY"
+    bankName: "Moniepoint MFB",
+    accountNumber: "5868587620",
+    accountName: "DUKE SOCHIMAOBI EKIEGINI"
   };
 
   const paymentAmount = 13450;
