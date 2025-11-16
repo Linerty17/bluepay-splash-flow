@@ -162,16 +162,18 @@ export const WithdrawModal = ({ open, onClose, availableBalance, onSuccess }: Wi
 
       if (uploadError) throw uploadError;
 
-      // Get public URL
-      const { data: { publicUrl } } = supabase.storage
+      // Generate signed URL (expires in 24 hours)
+      const { data: signedUrlData, error: signedUrlError } = await supabase.storage
         .from('withdrawal-proofs')
-        .getPublicUrl(fileName);
+        .createSignedUrl(fileName, 86400);
+
+      if (signedUrlError) throw signedUrlError;
 
       // Update withdrawal request
       const { error: updateError } = await supabase
         .from('withdrawal_requests')
         .update({
-          payment_screenshot: publicUrl,
+          payment_screenshot: signedUrlData.signedUrl,
           status: 'under_review'
         })
         .eq('id', withdrawalId);

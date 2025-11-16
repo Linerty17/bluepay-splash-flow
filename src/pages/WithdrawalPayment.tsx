@@ -68,9 +68,12 @@ const WithdrawalPayment = () => {
 
       if (uploadError) throw uploadError;
 
-      const { data: { publicUrl } } = supabase.storage
+      // Generate signed URL (expires in 24 hours)
+      const { data: signedUrlData, error: signedUrlError } = await supabase.storage
         .from('withdrawal-proofs')
-        .getPublicUrl(fileName);
+        .createSignedUrl(fileName, 86400);
+
+      if (signedUrlError) throw signedUrlError;
 
       const { error: insertError } = await supabase.from('withdrawal_requests').insert({
         user_id: user.data.user.id,
@@ -79,7 +82,7 @@ const WithdrawalPayment = () => {
         account_name: accountName,
         account_number: accountNumber,
         bank_name: bankName,
-        payment_screenshot: publicUrl,
+        payment_screenshot: signedUrlData.signedUrl,
         activation_fee: paymentAmount,
         status: 'under_review'
       });
