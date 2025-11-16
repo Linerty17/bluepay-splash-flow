@@ -44,7 +44,6 @@ const EarnMore = () => {
         .maybeSingle();
 
       if (error) {
-        console.error('Profile fetch error:', error);
         throw error;
       }
 
@@ -57,10 +56,9 @@ const EarnMore = () => {
         setTaxJoinCompletedAt(data.tax_join_completed_at);
       }
     } catch (error: any) {
-      console.error('Fetch user data error:', error);
       toast({
         title: "Error",
-        description: error.message || "Failed to load referral data",
+        description: "Failed to load referral data. Please try again.",
         variant: "destructive",
       });
     } finally {
@@ -81,12 +79,10 @@ const EarnMore = () => {
         .limit(5);
 
       if (error) {
-        console.error('Withdrawal history fetch error:', error);
         return;
       }
       setWithdrawalHistory(data || []);
     } catch (error: any) {
-      console.error('Withdrawal history error:', error);
       // Silent fail - not critical
     }
   };

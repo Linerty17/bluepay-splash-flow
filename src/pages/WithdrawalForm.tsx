@@ -75,7 +75,7 @@ const WithdrawalForm = () => {
         navigate('/earn-more');
       }
     } catch (error) {
-      console.error('Error checking withdrawals:', error);
+      // Silent fail - user can still proceed
     }
   };
 

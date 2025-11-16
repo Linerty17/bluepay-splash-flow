@@ -32,30 +32,17 @@ const Register = () => {
   });
 
   useEffect(() => {
-    // Check URL parameter first
+    // Only use URL parameter for referral code
     const refCode = searchParams.get('ref');
     
     if (refCode) {
       const upperRefCode = refCode.trim().toUpperCase();
-      // Store in localStorage for persistence
-      localStorage.setItem('referralCode', upperRefCode);
       setReferralCode(upperRefCode);
       setFormData((prev) => ({ ...prev, enteredReferralCode: upperRefCode }));
       toast({
         title: "Referral Code Applied!",
         description: `Using referral code: ${upperRefCode}`,
       });
-    } else {
-      // If no URL parameter, check localStorage
-      const storedRefCode = localStorage.getItem('referralCode');
-      if (storedRefCode) {
-        setReferralCode(storedRefCode);
-        setFormData((prev) => ({ ...prev, enteredReferralCode: storedRefCode }));
-        toast({
-          title: "Referral Code Restored!",
-          description: `Using referral code: ${storedRefCode}`,
-        });
-      }
     }
   }, [searchParams, toast]);
 
@@ -132,9 +119,6 @@ const Register = () => {
         fullName: formData.fullName,
         email: formData.email,
       });
-
-      // Clear referral code from localStorage after successful registration
-      localStorage.removeItem('referralCode');
 
       // Navigate to dashboard
       navigate("/dashboard");

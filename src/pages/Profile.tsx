@@ -107,7 +107,7 @@ const Profile = () => {
       try {
         mediaQuery.removeEventListener('change', handleChange);
       } catch (e) {
-        console.log('No existing listener');
+        // Silent fail - no existing listener
       }
       
       // Add new listener
