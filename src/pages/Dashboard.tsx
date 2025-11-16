@@ -24,7 +24,6 @@ const Dashboard = () => {
       
       // Check if speech synthesis is supported
       if (!('speechSynthesis' in window)) {
-        console.log('Speech synthesis not supported');
         return;
       }
 
@@ -62,11 +61,7 @@ const Dashboard = () => {
 
         // Error handling for mobile
         utterance.onerror = (event) => {
-          console.error('Speech synthesis error:', event);
-        };
-
-        utterance.onend = () => {
-          console.log('Welcome message completed');
+          // Silent fail for speech errors
         };
 
         // Speak with a delay to ensure everything is loaded
