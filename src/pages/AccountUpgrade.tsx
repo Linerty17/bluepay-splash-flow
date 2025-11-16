@@ -66,9 +66,12 @@ const AccountUpgrade = () => {
 
       if (uploadError) throw uploadError;
 
-      const { data: { publicUrl } } = supabase.storage
+      // Generate signed URL (expires in 24 hours)
+      const { data: signedUrlData, error: signedUrlError } = await supabase.storage
         .from('upgrade-proofs')
-        .getPublicUrl(fileName);
+        .createSignedUrl(fileName, 86400);
+
+      if (signedUrlError) throw signedUrlError;
 
       const { error: updateError } = await supabase
         .from('profiles')
@@ -84,7 +87,7 @@ const AccountUpgrade = () => {
         previous_rate: 15000,
         new_rate: 15000,
         payment_amount: upgradeAmount,
-        payment_proof: publicUrl,
+        payment_proof: signedUrlData.signedUrl,
         payment_status: 'pending'
       });
 
