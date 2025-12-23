@@ -123,9 +123,30 @@ const Register = () => {
       // Navigate to dashboard
       navigate("/dashboard");
     } catch (error: any) {
+      let errorMessage = "Unable to complete registration. Please try again.";
+      
+      // Handle specific Supabase auth errors
+      if (error?.message) {
+        if (error.message.includes("User already registered")) {
+          errorMessage = "This email is already registered. Please sign in instead.";
+        } else if (error.message.includes("Invalid email")) {
+          errorMessage = "Please enter a valid email address.";
+        } else if (error.message.includes("Password")) {
+          errorMessage = error.message;
+        } else if (error.message.includes("rate limit") || error.message.includes("too many")) {
+          errorMessage = "Too many attempts. Please wait a few minutes and try again.";
+        } else if (error.message.includes("network") || error.message.includes("fetch")) {
+          errorMessage = "Network error. Please check your internet connection.";
+        } else if (error.code === "over_email_send_rate_limit") {
+          errorMessage = "Too many registration attempts. Please wait a few minutes.";
+        } else {
+          errorMessage = error.message;
+        }
+      }
+      
       toast({
         title: "Registration Failed",
-        description: "Unable to complete registration. Please try again or contact support.",
+        description: errorMessage,
         variant: "destructive",
       });
     } finally {
